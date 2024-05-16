@@ -1,7 +1,10 @@
 import {M4} from "../libs/m4.ts";
 import {Vector3} from "../libs/vector3.ts";
+import {INode} from "../interfaces/node.ts";
+import {Mesh} from "./mesh.ts";
 
 export class Node {
+    static nodes: Node[] = [];
     static nodeIdx = 0;
     private _translation: Vector3 = new Vector3();
     private _rotation: Vector3 = new Vector3();
@@ -18,6 +21,7 @@ export class Node {
         this.idNode = Node.nodeIdx;
         Node.nodeIdx++;
         this.name = name;
+        Node.nodes.push(this);
     }
 
     // Public getter, prevent re-instance new object
@@ -129,5 +133,27 @@ export class Node {
     removeFromParent() {
         if (this.parent) this.parent.remove(this);
         return this;
+    }
+
+    toObject(): INode {
+        if (this instanceof Mesh) {
+            return {
+                mesh: this.idMesh,
+                name: this.name,
+                translation: this.translation.toArray(),
+                rotation: this.rotation.toArray(),
+                scale: this.scale.toArray()
+            }
+        }
+        //TODO: change this to node camera
+        else {
+            return {
+                mesh: 0,
+                name: this.name,
+                translation: this.translation.toArray(),
+                rotation: this.rotation.toArray(),
+                scale: this.scale.toArray()
+            }
+        }
     }
 }

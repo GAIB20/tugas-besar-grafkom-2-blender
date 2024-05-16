@@ -18,16 +18,6 @@ export class Mesh extends Node {
         this.material = material;
     }
 
-    toObjectNode() {
-        return {
-            mesh: this.idMesh,
-            name: this.name,
-            translation: this.translation.toArray(),
-            rotation: this.rotation.toArray(),
-            scale: this.scale.toArray()
-        }
-    }
-
     toObjectMesh(): IMesh {
         return {
             attributes: this.geometry.toObject(),

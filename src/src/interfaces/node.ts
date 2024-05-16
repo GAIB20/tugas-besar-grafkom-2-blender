@@ -7,6 +7,7 @@ export interface INodeMesh {
 }
 
 export interface INodeCamera {
+    name: string,
     camera: number,
     translation: number[],
     rotation: number[],
