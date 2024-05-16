@@ -21,4 +21,8 @@ export class Vector3 {
             this[2] * b[0] - this[0] * b[2],
             this[0] * b[1] - this[1] * b[0]];
     }
+
+    toArray() {
+        return [this[0], this[1], this[2]];
+    }
 }

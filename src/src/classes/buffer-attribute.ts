@@ -1,12 +1,16 @@
+import {IAccessor, IBuffer, IBufferView} from "../interfaces/buffer.ts";
+
 type TypedArray = Float32Array | Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array;
 
 export class BufferAttribute {
+    static BufferIdx: number;
     private _data: TypedArray;
     private _size: number;
     private _dtype: number;
     private _normalize = false;
     private _stride = 0;
     private _offset = 0;
+    id: number;
 
 
     private _isDirty = true; // kita copy atribut minimal sekali di awal terlebih dahulu
@@ -35,6 +39,8 @@ export class BufferAttribute {
         this._normalize = options.normalize || false;
         this._stride    = options.stride    || 0;
         this._offset    = options.offset    || 0;
+        this.id = BufferAttribute.BufferIdx;
+        BufferAttribute.BufferIdx++
     }
 
 
@@ -123,5 +129,28 @@ export class BufferAttribute {
             data[i] = this._data[index + this.offset + (this._stride * index * this._size) + i];
         }
         return data;
+    }
+
+    toObjectBuffer(): IBuffer {
+        return {
+            data: Array.from(this.data)
+        }
+    }
+
+    toObjectBufferView(): IBufferView {
+        return {
+            buffer: this.id,
+            byteOffset: this.offset,
+            byteLength: this.length,
+        }
+    }
+
+    toObjectAccessor(): IAccessor {
+        return {
+            bufferView: this.id,
+            byteOffset: this.offset,
+            componentType: this.dtype,
+            count: this.count,
+        }
     }
 }

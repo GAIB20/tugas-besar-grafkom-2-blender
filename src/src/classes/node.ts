@@ -2,7 +2,8 @@ import {M4} from "../libs/m4.ts";
 import {Vector3} from "../libs/vector3.ts";
 
 export class Node {
-    private _position: Vector3 = new Vector3();
+    static nodeIdx = 0;
+    private _translation: Vector3 = new Vector3();
     private _rotation: Vector3 = new Vector3();
     private _scale: Vector3 = new Vector3(1, 1, 1);
     private _localMatrix: M4 = M4.identity();
@@ -10,17 +11,18 @@ export class Node {
     private _parent?: Node;
     private _children: Node[] = []
     visible = true
-    id: number;
+    idNode: number;
     name: string;
 
-    constructor(id: number, name: string) {
-        this.id = id;
+    constructor(name: string) {
+        this.idNode = Node.nodeIdx;
+        Node.nodeIdx++;
         this.name = name;
     }
 
     // Public getter, prevent re-instance new object
-    get position() {
-        return this._position;
+    get translation() {
+        return this._translation;
     }
 
     get rotation() {
@@ -60,7 +62,7 @@ export class Node {
 
     computeLocalMatrix() {
         this._localMatrix = M4.multiply(
-            M4.translation3d(this._position),
+            M4.translation3d(this._translation),
             M4.rotation3d(this._rotation),
         );
         this._localMatrix = M4.multiply(
@@ -108,7 +110,7 @@ export class Node {
     }
 
     isEqual(node: Node) {
-        return this.id === node.id;
+        return this.idNode === node.idNode;
     }
 
 
