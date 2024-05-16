@@ -1,3 +1,5 @@
+import {Node} from '../classes/node';
+
 export function setupSlider(selector: string, options: { name: any; precision?: number; min?: number; step?: number; value?: number; max?: number; slide?: any; uiPrecision?: undefined; uiMult?: number; }) {
     var parent = document.querySelector(selector);
     if (!parent) {
@@ -58,4 +60,52 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
             updateValue(v);
         },
     };
+}
+
+export function createObjectHierarcy(node : Node, parent: HTMLElement){
+    const styleIl : string = 'inline-block p-4 bg-blue-600 text-white rounded';
+    const styleButton : string = 'inline-block p-1 px-2 mx-2 bg-green-500 text-white rounded hover:bg-green-700';
+    const styleUl : string = 'fill-current';
+
+    if(parent === null){
+        throw new Error("Parent HTML Element is null");
+    }
+    if(node.children.length === 0){
+        const il = document.createElement('il');
+        il.innerHTML = node.name; // node.name
+        il.className = styleIl;
+        parent.appendChild(il);
+        
+        const button = document.createElement('button');
+        button.textContent = 'select';
+        button.className = styleButton;
+        button.addEventListener('click', () => {
+            // TODO
+        })
+        il.appendChild(button);
+    }
+    else{
+        const il = document.createElement('il');
+        il.innerHTML = node.name; // node.name
+        il.className = styleIl;
+        parent.appendChild(il);
+        
+        const button = document.createElement('button');
+        button.textContent = 'select';
+        button.className = styleButton;
+        button.addEventListener('click', () => {
+            // TODO
+        })
+        il.appendChild(button);
+
+        const ul = document.createElement('ul');
+        // ul.className = styleUl;
+        ul.id = parent + "child";
+        il.appendChild(ul);
+
+        node.children.forEach(element => {
+            createObjectHierarcy(element, ul);
+        });
+    }
+
 }

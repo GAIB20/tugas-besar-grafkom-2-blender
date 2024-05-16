@@ -3,10 +3,12 @@ import {createProgram, createShader, resizeCanvasToDisplaySize} from "./utils/we
 import {VertexShaderSource} from "./shaders/vertex-shader.ts";
 import {FragmentShaderSource} from "./shaders/fragment-shader.ts";
 import {setupSlider} from "./utils/ui.ts";
+import { createObjectHierarcy } from './utils/ui.ts';
 import {M4} from "./libs/m4.ts";
 import {Vector3} from "./libs/vector3.ts";
 import {BufferGeometry} from "./classes/buffer-geometry.ts";
 import {BufferAttribute} from "./classes/buffer-attribute.ts";
+import {Node} from "./classes/node.ts";
 
 function main() {
     // Create WebGL program
@@ -112,6 +114,35 @@ function main() {
         precision: 2,
         name: "scale-z",
     });
+
+    // testing
+    let test = new Node("test");
+    let test1 = new Node("test1");
+    let test11 = new Node("test11");
+    let test12 = new Node("test12");
+    let test111 = new Node("test111");
+    let test2 = new Node("test2");
+    let test21 = new Node("test21");
+    let test211 = new Node("test211");
+
+    test.children.push(test1);
+    test.children.push(test2);
+    test1.children.push(test11);
+    test1.children.push(test12);
+    test11.children.push(test111);
+    test2.children.push(test21);
+    test21.children.push(test211);
+
+
+    const objectList = document.getElementById('objectList');
+    if(objectList !== null){
+        console.log('masuk');
+        createObjectHierarcy(test, objectList);
+    }
+    else{
+        console.error("Parent HTML Element is not found");
+    }
+    
 
     function updatePosition(index: number) {
         return function (_event: any, ui: { value: number; }) {
