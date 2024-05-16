@@ -10,11 +10,12 @@ export class Mesh extends Node {
     idMesh: number;
 
 
-    constructor(name: string, geometry: BufferGeometry) {
+    constructor(name: string, geometry: BufferGeometry, material: ShaderMaterial) {
         super(name);
         this.idMesh = Mesh.MeshIdx;
         Mesh.MeshIdx++;
         this.geometry = geometry;
+        this.material = material;
     }
 
     toObjectNode() {
