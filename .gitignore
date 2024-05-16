@@ -8,6 +8,7 @@ src/pnpm-debug.log*
 src/lerna-debug.log*
 src/dist
 src/node_modules/
+pnpm-lock.yaml
 *.local
 
 
