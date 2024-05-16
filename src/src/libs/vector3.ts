@@ -15,4 +15,10 @@ export class Vector3 {
     isEqual(vector3: Vector3) {
         return this[0] === vector3[0] && this[1] === vector3[1] && this[2] === vector3[2]
     }
+
+    cross(b: Vector3) {
+        return [this[1] * b[2] - this[2] * b[1],
+            this[2] * b[0] - this[0] * b[2],
+            this[0] * b[1] - this[1] * b[0]];
+    }
 }
