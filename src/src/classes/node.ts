@@ -10,7 +10,13 @@ export class Node {
     private _parent?: Node;
     private _children: Node[] = []
     visible = true
+    id: number;
+    name: string;
 
+    constructor(id: number, name: string) {
+        this.id = id;
+        this.name = name;
+    }
 
     // Public getter, prevent re-instance new object
     get position() {
@@ -102,8 +108,7 @@ export class Node {
     }
 
     isEqual(node: Node) {
-        // TODO: check this method
-        return this.position.isEqual(node.position) && this.scale.isEqual(node.scale) && this.rotation.isEqual(node.rotation) && this.parent === node.parent;
+        return this.id === node.id;
     }
 
 
