@@ -1,10 +1,12 @@
 import {BufferGeometry} from "./buffer-geometry.ts";
 import {Node} from "./node.ts";
+import {IMesh} from "../interfaces/mesh.ts";
+import {ShaderMaterial} from "./shader-material.ts";
 
 export class Mesh extends Node {
     static MeshIdx = 0;
     geometry: BufferGeometry
-    // material: ShaderMaterial
+    material: ShaderMaterial
     idMesh: number;
 
 
@@ -25,7 +27,10 @@ export class Mesh extends Node {
         }
     }
 
-    toObjectMesh() {
-
+    toObjectMesh(): IMesh {
+        return {
+            attributes: this.geometry.toObject(),
+            material: parseInt(this.material.id.slice(1))
+        }
     }
 }
