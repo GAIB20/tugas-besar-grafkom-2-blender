@@ -1,57 +1,59 @@
-export class OrthographicCamera {
-    left: number;
-    right: number;
-    top: number;
-    bottom: number;
-    near: number;
-    far: number;
-    projectionMatrix: Float32Array;
+import { Node } from "./node.ts";
+import {M4} from "../libs/m4.ts";
 
-    constructor(left: number, right: number, top: number, bottom: number, near: number, far: number) {
-        this.left = left;
-        this.right = right;
-        this.top = top;
-        this.bottom = bottom;
-        this.near = near;
-        this.far = far;
-        this.projectionMatrix = new Float32Array(16);
+export class OrthographicProjection extends Node {
+  private _left: number;
+  private _right: number;
+  private _top: number;
+  private _bottom: number;
+  private _near: number;
+  private _far: number;
 
-        this.updateProjectionMatrix();
-    }
+  constructor(
+    name: string,
+    left: number,
+    right: number,
+    top: number,
+    bottom: number,
+    near: number,
+    far: number
+  ) {
+    super(name);
+    this._left = left;
+    this._right = right;
+    this._top = top;
+    this._bottom = bottom;
+    this._near = near;
+    this._far = far;
+  }
 
-    updateProjectionMatrix(): void {
-        const lr = 1 / (this.left - this.right);
-        const bt = 1 / (this.bottom - this.top);
-        const nf = 1 / (this.near - this.far);
+  get left() {
+    return this._left;
+  }
 
-        this.projectionMatrix[0] = -2 * lr;
-        this.projectionMatrix[1] = 0;
-        this.projectionMatrix[2] = 0;
-        this.projectionMatrix[3] = 0;
+  get right() {
+    return this._right;
+  }
 
-        this.projectionMatrix[4] = 0;
-        this.projectionMatrix[5] = -2 * bt;
-        this.projectionMatrix[6] = 0;
-        this.projectionMatrix[7] = 0;
+  get top() {
+    return this._top;
+  }
 
-        this.projectionMatrix[8] = 0;
-        this.projectionMatrix[9] = 0;
-        this.projectionMatrix[10] = 2 * nf;
-        this.projectionMatrix[11] = 0;
+  get bottom() {
+    return this._bottom;
+  }
 
-        this.projectionMatrix[12] = (this.left + this.right) * lr;
-        this.projectionMatrix[13] = (this.top + this.bottom) * bt;
-        this.projectionMatrix[14] = (this.far + this.near) * nf;
-        this.projectionMatrix[15] = 1;
-    }
+  get near() {
+    return this._near;
+  }
 
-    setViewSize(width: number, height: number): void {
-        const aspectRatio = width / height;
-        const viewHeight = (this.top - this.bottom) / 2;
-        const viewWidth = viewHeight * aspectRatio;
+  get far() {
+    return this._far;
+  }
 
-        this.left = -viewWidth;
-        this.right = viewWidth;
-        this.updateProjectionMatrix();
-    }
+  computeProjectionMatrix(): M4 {
+    // implementasi
+
+    throw new Error("Method not implemented.");
+  }
 }
