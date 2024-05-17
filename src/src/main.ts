@@ -12,6 +12,17 @@ import {ProgramInfo} from "./types/web-gl.ts";
 import {calculateTransformation, cleanupObjects, drawMesh} from "./utils/scene.ts";
 import {Node} from "./classes/node.ts";
 
+let playAnimationTime = 0;
+
+function playAnimation(currentTime : number) {
+    if(playAnimationTime === 0){
+        playAnimationTime = currentTime;
+    }
+
+    // TODO : Integrate animation controller to the main
+    requestAnimationFrame(playAnimation);
+}
+
 function main() {
     const _gl = setupContext();
     if (!_gl) return;
@@ -107,7 +118,6 @@ function main() {
 
     const objectList = document.getElementById('objectList');
     if(objectList !== null){
-        console.log('masuk');
         createObjectHierarcy(test, objectList);
     }
     else{
