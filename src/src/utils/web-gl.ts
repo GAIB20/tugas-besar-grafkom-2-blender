@@ -62,6 +62,10 @@ export function degToRad(d: number) {
     return d * Math.PI / 180;
 }
 
+export function radToDeg(r: number) {
+    return r * 180 / Math.PI;
+}
+
 export function rand(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
@@ -84,16 +88,19 @@ function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram
                     // Data Changed Time (note that buffer is already binded)
                     gl.bufferData(gl.ARRAY_BUFFER, v.data, gl.STATIC_DRAW);
                     v.consume();
+                    console.log("here")
+                    console.log(v.data)
                 }
                 gl.enableVertexAttribArray(loc);
+                console.log("tes1")
+                console.log({...v})
                 gl.vertexAttribPointer(loc, v.size, v.dtype, v.normalize, v.stride, v.offset);
             } else {
                 gl.disableVertexAttribArray(loc);
                 if (v instanceof Float32Array) {
                     // @ts-ignore
                     gl[`vertexAttrib${v.length}fv`](loc, v);
-                }
-                else {
+                } else {
                     // @ts-ignore
                     gl[`vertexAttrib${values.length}f`](loc, ...values);
                 }
@@ -115,14 +122,16 @@ function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram
 
 function setAttribute(programInfo: ProgramInfo, attributeName: string, ...data: AttributeDataType) {
     const setters = programInfo.attributeSetters;
-    if (attributeName in setters) {
-        const shaderName = `a_${attributeName}`;
+    const shaderName = `a_${attributeName}`;
+    console.log(shaderName, " w seetters ", setters)
+    if (shaderName in setters) {
         setters[shaderName](...data);
     }
 }
+
 export function setAttributes(
     programInfo: ProgramInfo,
-    attributes: {[attributeName: string]: AttributeSingleDataType},
+    attributes: { [attributeName: string]: AttributeSingleDataType },
 ) {
     for (let attributeName in attributes)
         setAttribute(programInfo, attributeName, attributes[attributeName]);
@@ -177,12 +186,12 @@ export function setUniform(
     }
 }
 
-export function createProgramInfo(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-): ProgramInfo {
+export function createProgramInfo(gl: WebGLRenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader): ProgramInfo | null {
+    const program = createProgram(gl, vertexShader, fragmentShader)
+    if (!program) {
+        return null;
+    }
     return {
-        gl,
         program,
         attributeSetters: createAttributeSetters(gl, program),
         uniformSetters: createUniformSetters(gl, program),
