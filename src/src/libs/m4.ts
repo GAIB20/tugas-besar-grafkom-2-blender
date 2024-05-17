@@ -1,4 +1,4 @@
-import {Vector3} from "../libs/vector3.ts";
+import {Vector3} from "./vector3.ts";
 
 export class M4 {
     constructor() {
@@ -81,38 +81,38 @@ export class M4 {
     }
 
     static multiply(a: M4, b: M4) {
-        var a00 = a[0 * 4 + 0];
-        var a01 = a[0 * 4 + 1];
-        var a02 = a[0 * 4 + 2];
-        var a03 = a[0 * 4 + 3];
-        var a10 = a[1 * 4 + 0];
-        var a11 = a[1 * 4 + 1];
-        var a12 = a[1 * 4 + 2];
-        var a13 = a[1 * 4 + 3];
-        var a20 = a[2 * 4 + 0];
-        var a21 = a[2 * 4 + 1];
-        var a22 = a[2 * 4 + 2];
-        var a23 = a[2 * 4 + 3];
-        var a30 = a[3 * 4 + 0];
-        var a31 = a[3 * 4 + 1];
-        var a32 = a[3 * 4 + 2];
-        var a33 = a[3 * 4 + 3];
-        var b00 = b[0 * 4 + 0];
-        var b01 = b[0 * 4 + 1];
-        var b02 = b[0 * 4 + 2];
-        var b03 = b[0 * 4 + 3];
-        var b10 = b[1 * 4 + 0];
-        var b11 = b[1 * 4 + 1];
-        var b12 = b[1 * 4 + 2];
-        var b13 = b[1 * 4 + 3];
-        var b20 = b[2 * 4 + 0];
-        var b21 = b[2 * 4 + 1];
-        var b22 = b[2 * 4 + 2];
-        var b23 = b[2 * 4 + 3];
-        var b30 = b[3 * 4 + 0];
-        var b31 = b[3 * 4 + 1];
-        var b32 = b[3 * 4 + 2];
-        var b33 = b[3 * 4 + 3];
+        let a00 = a[0 * 4 + 0];
+        let a01 = a[0 * 4 + 1];
+        let a02 = a[0 * 4 + 2];
+        let a03 = a[0 * 4 + 3];
+        let a10 = a[1 * 4 + 0];
+        let a11 = a[1 * 4 + 1];
+        let a12 = a[1 * 4 + 2];
+        let a13 = a[1 * 4 + 3];
+        let a20 = a[2 * 4 + 0];
+        let a21 = a[2 * 4 + 1];
+        let a22 = a[2 * 4 + 2];
+        let a23 = a[2 * 4 + 3];
+        let a30 = a[3 * 4 + 0];
+        let a31 = a[3 * 4 + 1];
+        let a32 = a[3 * 4 + 2];
+        let a33 = a[3 * 4 + 3];
+        let b00 = b[0 * 4 + 0];
+        let b01 = b[0 * 4 + 1];
+        let b02 = b[0 * 4 + 2];
+        let b03 = b[0 * 4 + 3];
+        let b10 = b[1 * 4 + 0];
+        let b11 = b[1 * 4 + 1];
+        let b12 = b[1 * 4 + 2];
+        let b13 = b[1 * 4 + 3];
+        let b20 = b[2 * 4 + 0];
+        let b21 = b[2 * 4 + 1];
+        let b22 = b[2 * 4 + 2];
+        let b23 = b[2 * 4 + 3];
+        let b30 = b[3 * 4 + 0];
+        let b31 = b[3 * 4 + 1];
+        let b32 = b[3 * 4 + 2];
+        let b33 = b[3 * 4 + 3];
         let result = new M4();
         result[0] = b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30;
         result[1] = b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31;
