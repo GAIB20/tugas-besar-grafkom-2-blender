@@ -1,7 +1,7 @@
-import {Node} from '../classes/node';
+import {Node} from '../classes/node.ts';
 
 export function setupSlider(selector: string, options: { name: any; precision?: number; min?: number; step?: number; value?: number; max?: number; slide?: any; uiPrecision?: undefined; uiMult?: number; }) {
-    var parent = document.querySelector(selector);
+    let parent = document.querySelector(selector);
     if (!parent) {
         // like jquery don't fail on a bad selector
         return;
@@ -13,15 +13,15 @@ export function setupSlider(selector: string, options: { name: any; precision?: 
 }
 
 export function createSlider(parent: { innerHTML: string; querySelector: (arg0: string) => any; }, options: { precision?: number; min?: number; step?: number; value?: number; max?: number; slide?: any; name: any; uiPrecision?: undefined; uiMult?: number; }) {
-    var precision = options.precision || 0;
-    var min = options.min || 0;
-    var step = options.step || 1;
-    var value = options.value || 0;
-    var max = options.max || 1;
-    var fn = options.slide;
-    var name = options.name;
-    var uiPrecision = options.uiPrecision === undefined ? precision : options.uiPrecision;
-    var uiMult = options.uiMult || 1;
+    let precision = options.precision || 0;
+    let min = options.min || 0;
+    let step = options.step || 1;
+    let value = options.value || 0;
+    let max = options.max || 1;
+    let fn = options.slide;
+    let name = options.name;
+    let uiPrecision = options.uiPrecision === undefined ? precision : options.uiPrecision;
+    let uiMult = options.uiMult || 1;
 
     min /= step;
     max /= step;
@@ -34,8 +34,8 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
         <input class="gman-widget-slider" type="range" min="${min}" max="${max}" value="${value}" />
       </div>
     `;
-    var valueElem = parent.querySelector(".gman-widget-value");
-    var sliderElem = parent.querySelector(".gman-widget-slider");
+    let valueElem = parent.querySelector(".gman-widget-value");
+    let sliderElem = parent.querySelector(".gman-widget-slider");
 
     function updateValue(value: number) {
         valueElem.textContent = (value * step * uiMult).toFixed(uiPrecision);
@@ -44,7 +44,7 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
     updateValue(value);
 
     function handleChange(event: { target: { value: string; }; }) {
-        var value = parseInt(event.target.value);
+        let value = parseInt(event.target.value);
         updateValue(value);
         fn(event, { value: value * step });
     }
@@ -65,7 +65,7 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
 export function createObjectHierarcy(node : Node, parent: HTMLElement){
     const styleIl : string = 'inline-block p-4 bg-blue-600 text-white rounded';
     const styleButton : string = 'inline-block p-1 px-2 mx-2 bg-green-500 text-white rounded hover:bg-green-700';
-    const styleUl : string = 'fill-current';
+    // const styleUl : string = 'fill-current';
 
     if(parent === null){
         throw new Error("Parent HTML Element is null");
