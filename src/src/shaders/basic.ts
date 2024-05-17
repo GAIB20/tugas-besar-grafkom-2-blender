@@ -1,22 +1,25 @@
 export const basicVert = `
-attribute vec4 a_position;
-
-uniform mat4 u_worldMatrix;
-uniform mat4 u_viewProjectionMatrix;
-
-void main() {
-   gl_Position = u_viewProjectionMatrix * u_worldMatrix * a_position;
-   v_color = a_color;
-}
-`
+    attribute vec4 a_position;
+    attribute vec4 a_color;
+    
+    uniform mat4 u_matrix;
+    
+    varying vec4 v_color;
+    
+    void main() {
+      // Multiply the position by the matrix.
+      gl_Position = u_matrix * a_position;
+    
+      // Pass the color to the fragment shader.
+      v_color = a_color;
+    }`
 
 export const basicFrag = `
-precision mediump float;
+    precision mediump float;
 
-uniform vec4 u_ligthColor;
-varying vec4 u_color;
-
-void main() {
-   gl_FragColor = u_color * u_ligthColor; // Ia = ka * La
-}
-`
+    // Passed in from the vertex shader.
+    varying vec4 v_color;
+    
+    void main() {
+       gl_FragColor = v_color;
+    }`
