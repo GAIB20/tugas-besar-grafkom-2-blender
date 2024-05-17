@@ -6,7 +6,7 @@ export class M4 {
             this[i] = 0;
         }
     }
-    get matrix() {
+    get matrix(): number[] {
         let data = new Array(16).fill(0);
         for (let i = 0; i < data.length; i++) {
             data[i] = this[i];
@@ -136,10 +136,10 @@ export class M4 {
     static projection(width: number, height: number, depth: number): M4 {
         const m4 = new M4();
         m4[0] = 2 / width;
-        m4[5] = -2 / height;
-        m4[10] = 2 / depth;
-        m4[12] = -1;
-        m4[13] = 1;
+        m4[5] = 2 / height;
+        m4[10] = -2 / depth;
+        m4[12] = 0;
+        m4[13] = 0;
         m4[15] = 1;
         return m4;
     }
