@@ -1,7 +1,5 @@
 import {M4} from "../libs/m4.ts";
 import {Vector3} from "../libs/vector3.ts";
-import {INode} from "../interfaces/node.ts";
-import {Mesh} from "./mesh.ts";
 
 export class Node {
     static nodes: Node[] = [];
@@ -61,6 +59,17 @@ export class Node {
             this._parent = parent;
             this.computeWorldMatrix(false, true);
         }
+    }
+
+    set translation(vec3: Vector3) {
+        this._translation = vec3;
+    }
+
+    set rotation(vec3: Vector3) {
+        this._rotation = vec3;
+    }
+    set scale(vec3: Vector3) {
+        this._scale = vec3;
     }
 
 
@@ -135,25 +144,25 @@ export class Node {
         return this;
     }
 
-    toObject(): INode {
-        if (this instanceof Mesh) {
-            return {
-                mesh: this.idMesh,
-                name: this.name,
-                translation: this.translation.toArray(),
-                rotation: this.rotation.toArray(),
-                scale: this.scale.toArray()
-            }
-        }
-        //TODO: change this to node camera
-        else {
-            return {
-                mesh: 0,
-                name: this.name,
-                translation: this.translation.toArray(),
-                rotation: this.rotation.toArray(),
-                scale: this.scale.toArray()
-            }
-        }
-    }
+    // toObject(): INode {
+    //     if (this instanceof Mesh) {
+    //         return {
+    //             mesh: this.idMesh,
+    //             name: this.name,
+    //             translation: this.translation.toArray(),
+    //             rotation: this.rotation.toArray(),
+    //             scale: this.scale.toArray()
+    //         }
+    //     }
+    //     //TODO: change this to node camera
+    //     else {
+    //         return {
+    //             mesh: 0,
+    //             name: this.name,
+    //             translation: this.translation.toArray(),
+    //             rotation: this.rotation.toArray(),
+    //             scale: this.scale.toArray()
+    //         }
+    //     }
+    // }
 }
