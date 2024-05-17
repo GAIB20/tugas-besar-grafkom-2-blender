@@ -1,7 +1,7 @@
 import { M4 } from "../libs/m4.ts";
 import {Camera} from "./camera.ts";
 
-export class PerspectiveProjectionBaseClass extends Camera {
+export class PerspectiveCamera extends Camera {
   private _fovY: number;
   private _aspect: number;
   private _near: number;

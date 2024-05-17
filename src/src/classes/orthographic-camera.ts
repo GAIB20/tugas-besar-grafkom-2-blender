@@ -1,7 +1,7 @@
 import {M4} from "../libs/m4.ts";
 import {Camera} from "./camera.ts";
 
-export class OrthographicProjection extends Camera {
+export class OrthographicCamera extends Camera {
   private _left: number;
   private _right: number;
   private _top: number;
@@ -52,8 +52,6 @@ export class OrthographicProjection extends Camera {
   }
 
   computeProjectionMatrix(): M4 {
-    // implementasi
-
-    throw new Error("Method not implemented.");
+    return M4.orthographic(Math.abs(this.right - this.left), Math.abs(this.top - this.bottom), this.near, this.far);
   }
 }

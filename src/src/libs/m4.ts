@@ -265,4 +265,15 @@ export class M4 {
 
         return result;
     }
+
+    static orthographic(width: number, height: number, near: number, far: number): M4 {
+        let result = new M4();
+        result[0] = 2 / width;
+        result[5] = 2 / height;
+        result[10] = -2 / (near - far);
+        result[14] = (near + far) / (near - far);
+        result[15] = 1;
+
+        return result;
+    }
 }
