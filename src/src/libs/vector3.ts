@@ -17,12 +17,35 @@ export class Vector3 {
     }
 
     cross(b: Vector3) {
-        return [this[1] * b[2] - this[2] * b[1],
-            this[2] * b[0] - this[0] * b[2],
-            this[0] * b[1] - this[1] * b[0]];
+        let result = new Vector3()
+        result[0] = this[1] * b[2] - this[2] * b[1];
+        result[1] = this[2] * b[0] - this[0] * b[2];
+        result[2] = this[0] * b[1] - this[1] * b[0];
+        return result;
     }
 
     toArray() {
         return [this[0], this[1], this[2]];
+    }
+
+    normalize() {
+        let length = Math.sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2]);
+        if (length > 0.00001) {
+            this[0] = this[0] / length;
+            this[1] = this[1] / length;
+            this[2] = this[2] / length;
+        } else {
+            this[0] = 0;
+            this[1] = 0;
+            this[2] = 0;
+        }
+        return this
+    }
+
+    subtract(v: Vector3) {
+        this[0] -= v[0];
+        this[1] -= v[1];
+        this[1] -= v[1];
+        return this
     }
 }
