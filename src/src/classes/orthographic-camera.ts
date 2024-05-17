@@ -1,7 +1,7 @@
-import { Node } from "./node.ts";
 import {M4} from "../libs/m4.ts";
+import {Camera} from "./camera.ts";
 
-export class OrthographicProjection extends Node {
+export class OrthographicProjection extends Camera {
   private _left: number;
   private _right: number;
   private _top: number;
