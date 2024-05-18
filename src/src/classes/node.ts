@@ -2,6 +2,7 @@ import {M4} from "../libs/m4.ts";
 import {Vector3} from "../libs/vector3.ts";
 
 export class Node {
+    static nodes: Node[] = [];
     static nodeIdx = 0;
     private _translation: Vector3 = new Vector3();
     private _rotation: Vector3 = new Vector3();
@@ -18,6 +19,7 @@ export class Node {
         this.idNode = Node.nodeIdx;
         Node.nodeIdx++;
         this.name = name;
+        Node.nodes.push(this);
     }
 
     // Public getter, prevent re-instance new object
