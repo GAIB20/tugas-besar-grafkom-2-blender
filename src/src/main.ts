@@ -2,7 +2,7 @@ import './style.css'
 import {createProgramInfo, createShader, degToRad, radToDeg} from "./utils/web-gl.ts";
 import {createObjectHierarcy, setupSlider} from "./utils/ui.ts";
 import {Vector3} from "./libs/vector3.ts";
-import {setupCanvas, setupContext} from "./utils/setup.ts";
+import {setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
 import {BufferGeometry} from "./classes/buffer-geometry.ts";
 import {BufferAttribute} from "./classes/buffer-attribute.ts";
 import {basicFrag, basicVert} from "./shaders/basic.ts";
@@ -44,6 +44,8 @@ function main() {
     let rootNode: Node | null = null;
     let selectedNode: Node | null = null;
 
+    let selectedCamera = 'orthographic';
+
     const geometry = new BufferGeometry();
     geometry.setAttribute('position', new BufferAttribute(getGeometry(), 3))
     geometry.setAttribute('color', new BufferAttribute(getColors(), 3, {dtype: gl.UNSIGNED_BYTE, normalize: true}))
@@ -52,9 +54,16 @@ function main() {
 
     const mesh = new Mesh('test', geometry, material)
 
-    mesh.translation = (new Vector3(45, 150, 0))
+    mesh.translation = (new Vector3(45, 150, -10))
     mesh.rotation = (new Vector3(degToRad(40), degToRad(180), degToRad(145)));
     mesh.scale = new Vector3(1, 1, 1);
+
+    const childMesh = new Mesh('child1', geometry, material)
+    childMesh.translation = (new Vector3(100, 150, 0))
+    childMesh.rotation = (new Vector3(degToRad(40), degToRad(180), degToRad(145)));
+    childMesh.scale = new Vector3(1, 1, 1);
+
+    mesh.add(childMesh)
 
     rootNode = mesh;
     selectedNode = mesh
@@ -97,28 +106,16 @@ function main() {
     });
 
 
-    // testing
-    let test = new Node("test");
-    let test1 = new Node("test1");
-    let test11 = new Node("test11");
-    let test12 = new Node("test12");
-    let test111 = new Node("test111");
-    let test2 = new Node("test2");
-    let test21 = new Node("test21");
-    let test211 = new Node("test211");
+    // const originNode = new Node("origin");
 
-    test.children.push(test1);
-    test.children.push(test2);
-    test1.children.push(test11);
-    test1.children.push(test12);
-    test11.children.push(test111);
-    test2.children.push(test21);
-    test21.children.push(test211);
-
+    const setSelectedNode = (node: Node) => {
+        selectedNode = node;
+    }
 
     const objectList = document.getElementById('objectList');
     if(objectList !== null){
-        createObjectHierarcy(test, objectList);
+        console.log('masuk');
+        createObjectHierarcy(rootNode, objectList, setSelectedNode);
     }
     else{
         console.error("Parent HTML Element is not found");
@@ -128,7 +125,7 @@ function main() {
     function updatePosition(index: number) {
         if (!selectedNode) return
         return function (_event: any, ui: { value: number; }) {
-            selectedNode.translation[index] = ui.value;
+            selectedNode!.translation[index] = ui.value;
             drawScene();
         };
     }
@@ -137,7 +134,7 @@ function main() {
         if (!selectedNode) return
         return function (_event: any, ui: { value: any; }) {
             let angleInDegrees = ui.value;
-            selectedNode.rotation[index] = angleInDegrees * Math.PI / 180;
+            selectedNode!.rotation[index] = angleInDegrees * Math.PI / 180;
             drawScene();
         };
     }
@@ -145,7 +142,7 @@ function main() {
     function updateScale(index: number) {
         if (!selectedNode) return
         return function (_event: any, ui: { value: number; }) {
-            selectedNode.scale[index] = ui.value;
+            selectedNode!.scale[index] = ui.value;
             drawScene();
         };
     }
@@ -154,12 +151,15 @@ function main() {
     function drawScene() {
         setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
 
+        let camera = setupCamera(selectedCamera, gl)
+        camera = null
+
         let lastUsedProgramInfo: ProgramInfo | null = null;
         let lastUsedGeometry: BufferGeometry | null = null;
 
         if (!selectedNode || !rootNode || !basicProgramInfo || !phongProgramInfo) return
         calculateTransformation(selectedNode)
-        drawMesh(rootNode, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
+        drawMesh(rootNode, camera, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
 
         const primitiveType = gl.TRIANGLES;
         const offset = 0;

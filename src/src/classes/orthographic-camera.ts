@@ -2,45 +2,31 @@ import {M4} from "../libs/m4.ts";
 import {Camera} from "./camera.ts";
 
 export class OrthographicCamera extends Camera {
-  private _left: number;
-  private _right: number;
-  private _top: number;
-  private _bottom: number;
+  private _width: number;
+  private _height: number;
   private _near: number;
   private _far: number;
 
   constructor(
     name: string,
-    left: number,
-    right: number,
-    top: number,
-    bottom: number,
+    width: number,
+    height: number,
     near: number,
     far: number
   ) {
     super(name);
-    this._left = left;
-    this._right = right;
-    this._top = top;
-    this._bottom = bottom;
+    this._width = width;
+    this._height = height;
     this._near = near;
     this._far = far;
   }
 
-  get left() {
-    return this._left;
+  get width() {
+    return this._width;
   }
 
-  get right() {
-    return this._right;
-  }
-
-  get top() {
-    return this._top;
-  }
-
-  get bottom() {
-    return this._bottom;
+  get height() {
+    return this._height;
   }
 
   get near() {
@@ -52,6 +38,6 @@ export class OrthographicCamera extends Camera {
   }
 
   computeProjectionMatrix(): M4 {
-    return M4.orthographic(Math.abs(this.right - this.left), Math.abs(this.top - this.bottom), this.near, this.far);
+    return M4.orthographic(this.width, this.height, this.near, this.far);
   }
 }

@@ -62,7 +62,7 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
     };
 }
 
-export function createObjectHierarcy(node : Node, parent: HTMLElement){
+export function createObjectHierarcy(node : Node, parent: HTMLElement, setSelectedNode: (node: Node) => void){
     const styleIl : string = 'inline-block p-4 bg-blue-600 text-white rounded';
     const styleButton : string = 'inline-block p-1 px-2 mx-2 bg-green-500 text-white rounded hover:bg-green-700';
     // const styleUl : string = 'fill-current';
@@ -80,7 +80,7 @@ export function createObjectHierarcy(node : Node, parent: HTMLElement){
         button.textContent = 'select';
         button.className = styleButton;
         button.addEventListener('click', () => {
-            // TODO
+            setSelectedNode(node)
         })
         il.appendChild(button);
     }
@@ -94,7 +94,7 @@ export function createObjectHierarcy(node : Node, parent: HTMLElement){
         button.textContent = 'select';
         button.className = styleButton;
         button.addEventListener('click', () => {
-            // TODO
+            setSelectedNode(node)
         })
         il.appendChild(button);
 
@@ -104,7 +104,7 @@ export function createObjectHierarcy(node : Node, parent: HTMLElement){
         il.appendChild(ul);
 
         node.children.forEach(element => {
-            createObjectHierarcy(element, ul);
+            createObjectHierarcy(element, ul, setSelectedNode);
         });
     }
 

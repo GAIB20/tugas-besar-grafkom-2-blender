@@ -5,12 +5,13 @@ import {ProgramInfo} from "../types/web-gl.ts";
 import {BufferGeometry} from "../classes/buffer-geometry.ts";
 import {setAttributes, setUniform} from "./web-gl.ts";
 import {M4} from "../libs/m4.ts";
+import {Camera} from "../classes/camera.ts";
 
 export const cleanupObjects = (): void => {
     Node.nodes = []
 }
 
-export const drawMesh = (mesh: Node, gl: WebGLRenderingContext, basicProgramInfo: ProgramInfo, phongProgramInfo: ProgramInfo, lastUsedProgramInfo: ProgramInfo | null, lastUsedGeometry: BufferGeometry | null) => {
+export const drawMesh = (mesh: Node, camera: Camera | null, gl: WebGLRenderingContext, basicProgramInfo: ProgramInfo, phongProgramInfo: ProgramInfo, lastUsedProgramInfo: ProgramInfo | null, lastUsedGeometry: BufferGeometry | null) => {
     if (!(mesh instanceof Mesh)) return
 
     let meshProgramInfo = mesh.material instanceof BasicMaterial ? basicProgramInfo : phongProgramInfo;
@@ -29,7 +30,7 @@ export const drawMesh = (mesh: Node, gl: WebGLRenderingContext, basicProgramInfo
         setAttributes(meshProgramInfo, mesh.geometry.attributes);
     }
 
-    let projection = M4.projection(gl.canvas.width, gl.canvas.height, 400);
+    let projection = camera?.viewProjectionMatrix ?? M4.projection(gl.canvas.width, gl.canvas.height, 400);
     projection = M4.multiply(projection, mesh.worldMatrix);
     setUniform(meshProgramInfo, 'matrix', gl.FLOAT_MAT4, projection.matrix);
 
@@ -40,7 +41,7 @@ export const drawMesh = (mesh: Node, gl: WebGLRenderingContext, basicProgramInfo
     gl.drawArrays(primitiveType, offset, count);
 
     mesh.children.forEach((child) => {
-        drawMesh(child, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry);
+        drawMesh(child, camera, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry);
     });
 }
 

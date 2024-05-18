@@ -1,4 +1,6 @@
 import {resizeCanvasToDisplaySize} from "./web-gl.ts";
+import {Camera} from "../classes/camera.ts";
+import {OrthographicCamera} from "../classes/orthographic-camera.ts";
 
 export const setupContext = () => {
     let _canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
@@ -27,4 +29,15 @@ export const setupCanvas = (canvas: HTMLCanvasElement, gl: WebGLRenderingContext
 
     // Enable the depth buffer
     gl.enable(gl.DEPTH_TEST);
+}
+
+export const setupCamera = (type: string, gl: WebGLRenderingContext): Camera | null => {
+    let camera = null;
+    if (type === 'orthographic') {
+        const near = -1;
+        const far = -500;
+        camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, near, far);
+        camera.computeProjectionMatrix()
+    }
+    return camera
 }
