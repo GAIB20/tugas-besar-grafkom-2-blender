@@ -34,8 +34,8 @@ export const setupCanvas = (canvas: HTMLCanvasElement, gl: WebGLRenderingContext
 export const setupCamera = (type: string, gl: WebGLRenderingContext): Camera | null => {
     let camera = null;
     if (type === 'orthographic') {
-        const near = -1;
-        const far = -500;
+        const near = 0;
+        const far = -1000;
         camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, near, far);
         camera.computeProjectionMatrix()
     }

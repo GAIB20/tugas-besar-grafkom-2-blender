@@ -37,7 +37,7 @@ export class OrthographicCamera extends Camera {
     return this._far;
   }
 
-  computeProjectionMatrix(): M4 {
-    return M4.orthographic(this.width, this.height, this.near, this.far);
+  computeProjectionMatrix() {
+    this._projectionMatrix = M4.orthographic(this.width, this.height, -this.near, -this.far);
   }
 }

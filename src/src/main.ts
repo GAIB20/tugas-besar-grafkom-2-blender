@@ -54,7 +54,7 @@ function main() {
 
     const mesh = new Mesh('test', geometry, material)
 
-    mesh.translation = (new Vector3(45, 150, -10))
+    mesh.translation = (new Vector3(45, 150, -200))
     mesh.rotation = (new Vector3(degToRad(40), degToRad(180), degToRad(145)));
     mesh.scale = new Vector3(1, 1, 1);
 
@@ -71,9 +71,9 @@ function main() {
     drawScene();
 
     // Setup a ui.
-    setupSlider("#x", {name: "x", value: mesh.translation[0], slide: updatePosition(0), max: gl.canvas.width});
-    setupSlider("#y", {name: "y", value: mesh.translation[1], slide: updatePosition(1), max: gl.canvas.height});
-    setupSlider("#z", {name: "z", value: mesh.translation[2], slide: updatePosition(2), max: gl.canvas.height});
+    setupSlider("#x", {name: "x", value: mesh.translation[0], slide: updatePosition(0), min: -gl.canvas.width, max: gl.canvas.width});
+    setupSlider("#y", {name: "y", value: mesh.translation[1], slide: updatePosition(1), min: -gl.canvas.height, max: gl.canvas.height});
+    setupSlider("#z", {name: "z", value: mesh.translation[2], slide: updatePosition(2), min: -gl.canvas.height, max: gl.canvas.height});
     setupSlider("#angleX", {name: "angle-x", value: radToDeg(mesh.rotation[0]), slide: updateRotation(0), max: 360});
     setupSlider("#angleY", {name: "angle-y", value: radToDeg(mesh.rotation[1]), slide: updateRotation(1), max: 360});
     setupSlider("#angleZ", {name: "angle-z", value: radToDeg(mesh.rotation[2]), slide: updateRotation(2), max: 360});
@@ -152,7 +152,6 @@ function main() {
         setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
 
         let camera = setupCamera(selectedCamera, gl)
-        camera = null
 
         let lastUsedProgramInfo: ProgramInfo | null = null;
         let lastUsedGeometry: BufferGeometry | null = null;
