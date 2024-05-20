@@ -67,9 +67,16 @@ function main() {
     console.log(selectedNode.idNode);
 
     const animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json');
-    createButton(document.getElementById('rightContainer'), {name: "Play", onClick: () => {
-        animator.play();
-        requestAnimationFrame(playAnimation);
+    const animButton = createButton(document.getElementById('rightContainer'), {name: "Play", onClick: () => {
+        if(animator.isPlaying()){
+            animator.stop();
+            if(animButton) animButton.textContent = "Play";
+        }
+        else {
+            animator.play();
+            requestAnimationFrame(playAnimation);
+            if(animButton) animButton.textContent = "Pause";
+        }
     }})
 
     console.log(selectedNode.idNode);
@@ -183,11 +190,13 @@ function main() {
         }
         const deltaSecond = (time - playAnimationTime) / 1000;
         animator.update(deltaSecond);
-        animator.update(time);
+        // animator.update(time);
         drawScene();
 
         playAnimationTime = time;
-        requestAnimationFrame(playAnimation);
+        if(animator.isPlaying()){
+            requestAnimationFrame(playAnimation);
+        }
     }
 
     const setSelectedNode = (node: Node) => {

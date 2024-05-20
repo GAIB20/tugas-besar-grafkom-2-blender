@@ -70,7 +70,10 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
         button.addEventListener('click', options.onClick);
 
         parent.appendChild(button);
+
+        return button;
     }
+
 }
 
 export function createObjectHierarcy(node : Node, parent: HTMLElement, setSelectedNode: (node: Node) => void){

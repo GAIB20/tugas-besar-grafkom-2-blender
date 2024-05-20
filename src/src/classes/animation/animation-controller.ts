@@ -13,7 +13,8 @@ export class AnimationController {
     private _currentFrame: number = 0;
     private _objectRoot: Node;
     private _deltaFrame: number = 0;
-    fps: number = 30;
+    fps: number = 24;
+    speed: number = 0.6;
 
     constructor(root : Node, animFilePath : string) {
         fetch(animFilePath)
@@ -28,6 +29,10 @@ export class AnimationController {
         this._playing = true;
     }
 
+    isPlaying() {
+        return this._playing;
+    }
+
     stop() {
         this._playing = false;
     }
@@ -35,14 +40,13 @@ export class AnimationController {
     update(secElapsed: number) {
 
         if (this._playing) {
-            this._deltaFrame += secElapsed * this.fps;
+            this._deltaFrame += (secElapsed * this.fps * this.speed);
             if(this._deltaFrame >= 1){
                 this._currentFrame = (this._currentFrame + Math.floor(this._deltaFrame)) % this._frames.length;
-                console.log("frame played: ", this._currentFrame);
+                
                 this._deltaFrame %= 1;
                 this.animateNode();
             }
-            // does it need to drawscene? mungkin drawscene di main.ts
         }
     }
     // update(deltaSecond: number) {
@@ -58,6 +62,7 @@ export class AnimationController {
 
     animateNode(){
         const frame = this._frames[this._currentFrame];
+        console.log("frame played: ", this._currentFrame);
 
         for (let i = 0; i < frame.Keyframes.length; i++) {
             const keyframe = frame.Keyframes[i];
@@ -67,7 +72,8 @@ export class AnimationController {
                     node.translation = keyframe.translation;
                 }
                 if(keyframe.rotation){
-                    keyframe.rotation.toAngle();
+                    // console.log("masuk");
+                    // keyframe.rotation.toAngle();
                     node.rotation = keyframe.rotation;
                 }
                 if(keyframe.scale){
