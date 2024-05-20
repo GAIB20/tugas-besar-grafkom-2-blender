@@ -6,31 +6,55 @@ interface Frame {
     Keyframes: Keyframe[];
 }
 
-export class AnimatorController {
+export class AnimationController {
 
     private _playing: boolean = false;
     private _frames: Frame[] = [];
     private _currentFrame: number = 0;
     private _objectRoot: Node;
+    private _deltaFrame: number = 0;
     fps: number = 30;
 
     constructor(root : Node, animFilePath : string) {
-        const json = this.load(animFilePath);
-        this.loadFrames(json);
+        fetch(animFilePath)
+            .then(response => response.json())
+            .then(json => this.loadFrames(json))
+            .catch(error => console.error('Error:', error));
 
         this._objectRoot = root;
     }
 
-    update(secElapsed: number) {
-        if (this._playing) {
-            this._currentFrame += secElapsed * this.fps;
-            this._currentFrame = Math.floor(this._currentFrame);
-            this._currentFrame %= this._frames.length;
+    play() {
+        this._playing = true;
+    }
 
-            this.animateNode();
+    stop() {
+        this._playing = false;
+    }
+
+    update(secElapsed: number) {
+
+        if (this._playing) {
+            this._deltaFrame += secElapsed * this.fps;
+            if(this._deltaFrame >= 1){
+                this._currentFrame = (this._currentFrame + Math.floor(this._deltaFrame)) % this._frames.length;
+                console.log("frame played: ", this._currentFrame);
+                this._deltaFrame %= 1;
+                this.animateNode();
+            }
             // does it need to drawscene? mungkin drawscene di main.ts
         }
     }
+    // update(deltaSecond: number) {
+    //     if (this.isPlaying) {
+    //         this.deltaFrame += deltaSecond * this.fps;
+    //         if (this.deltaFrame >= 1) { // 1 frame
+    //             this.currentFrame = (this.currentFrame + Math.floor(this.deltaFrame)) % this.length;
+    //             this.deltaFrame %= 1;
+    //             this.updateSceneGraph();
+    //         }
+    //     }
+    // }
 
     animateNode(){
         const frame = this._frames[this._currentFrame];
@@ -39,9 +63,16 @@ export class AnimatorController {
             const keyframe = frame.Keyframes[i];
             const node = this._objectRoot.findNodeById(keyframe.nodeId);
             if (node) {
-                node.translation = keyframe.translation;
-                node.rotation = keyframe.rotation;
-                node.scale = keyframe.scale;
+                if(keyframe.translation){
+                    node.translation = keyframe.translation;
+                }
+                if(keyframe.rotation){
+                    keyframe.rotation.toAngle();
+                    node.rotation = keyframe.rotation;
+                }
+                if(keyframe.scale){
+                    node.scale = keyframe.scale;
+                }
             } else {
                 console.error(`Node with id ${keyframe.nodeId} not found`);
             
@@ -50,9 +81,10 @@ export class AnimatorController {
         
     }
 
-    loadFrames(json : any) {
-        for (let i = 0; i < json.frames.length; i++) {
-            const frame = json.frames[i];
+    loadFrames(data : any) {
+
+        for (let i = 0; i < data.frames.length; i++) {
+            const frame = data.frames[i];
             const keyframes = frame.keyframes;
             const keyframeList: Keyframe[] = [];
 

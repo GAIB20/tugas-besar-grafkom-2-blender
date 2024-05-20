@@ -62,6 +62,17 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
     };
 }
 
+export function createButton(parent: HTMLElement | null, options: { name: any; onClick: any; }) {
+    if(parent != null){
+        let button = document.createElement('button');
+        button.textContent = options.name;
+        button.className = 'gman-widget-button';
+        button.addEventListener('click', options.onClick);
+
+        parent.appendChild(button);
+    }
+}
+
 export function createObjectHierarcy(node : Node, parent: HTMLElement, setSelectedNode: (node: Node) => void){
     const styleIl : string = 'inline-block p-4 bg-blue-600 text-white rounded';
     const styleButton : string = 'inline-block p-1 px-2 mx-2 bg-green-500 text-white rounded hover:bg-green-700';

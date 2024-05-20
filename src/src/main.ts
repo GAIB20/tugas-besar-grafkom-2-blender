@@ -11,17 +11,10 @@ import {Mesh} from "./classes/mesh.ts";
 import {ProgramInfo} from "./types/web-gl.ts";
 import {calculateTransformation, cleanupObjects, drawMesh} from "./utils/scene.ts";
 import {Node} from "./classes/node.ts";
+import {AnimationController} from "./classes/animation/animation-controller.ts";
+import {createButton} from "./utils/ui.ts";
 
-let playAnimationTime = 0;
-
-function playAnimation(currentTime: number) {
-    if (playAnimationTime === 0) {
-        playAnimationTime = currentTime;
-    }
-
-    // TODO : Integrate animation controller to the main
-    requestAnimationFrame(playAnimation);
-}
+let playAnimationTime : number | undefined = undefined;
 
 function main() {
     const _gl = setupContext();
@@ -71,6 +64,17 @@ function main() {
     rootNode = mesh;
     selectedNode = mesh
 
+    console.log(selectedNode.idNode);
+
+    const animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json');
+    createButton(document.getElementById('rightContainer'), {name: "Play", onClick: () => {
+        animator.play();
+        requestAnimationFrame(playAnimation);
+    }})
+
+    console.log(selectedNode.idNode);
+
+    
 
     document.addEventListener('DOMContentLoaded', () => {
         drawScene();
@@ -173,6 +177,18 @@ function main() {
     canvas.addEventListener('mouseup', handleMouseUp);
     canvas.addEventListener('mouseleave', handleMouseUp);
 
+    const playAnimation = (time: number) => {
+        if (playAnimationTime === undefined) {
+            playAnimationTime = time;
+        }
+        const deltaSecond = (time - playAnimationTime) / 1000;
+        animator.update(deltaSecond);
+        animator.update(time);
+        drawScene();
+
+        playAnimationTime = time;
+        requestAnimationFrame(playAnimation);
+    }
 
     const setSelectedNode = (node: Node) => {
         selectedNode = node;

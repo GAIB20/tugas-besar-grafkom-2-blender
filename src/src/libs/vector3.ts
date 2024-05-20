@@ -16,6 +16,12 @@ export class Vector3 {
         return this[0] === vector3[0] && this[1] === vector3[1] && this[2] === vector3[2]
     }
 
+    toAngle() {
+        this[0] *= Math.PI / 180;
+        this[1] *= Math.PI / 180;
+        this[2] *= Math.PI / 180;
+    }
+
     cross(b: Vector3) {
         let result = new Vector3()
         result[0] = this[1] * b[2] - this[2] * b[1];

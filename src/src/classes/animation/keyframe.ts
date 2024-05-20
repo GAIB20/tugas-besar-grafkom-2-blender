@@ -10,9 +10,9 @@ interface KeyframeData {
 export class Keyframe {
     
     nodeId: number = 0;
-    translation: Vector3 = new Vector3();
-    rotation: Vector3 = new Vector3();
-    scale: Vector3 = new Vector3();
+    translation: Vector3 | undefined = undefined;
+    rotation: Vector3 | undefined = undefined;
+    scale: Vector3 | undefined = undefined;
 
     constructor(nodeIdOrData?: number | KeyframeData, translation?: Vector3, rotation?: Vector3, scale?: Vector3) {
         if (typeof nodeIdOrData === 'number') {
@@ -22,18 +22,24 @@ export class Keyframe {
             this.scale = scale!;
         } else if (nodeIdOrData) {
             this.nodeId = nodeIdOrData.nodeId;
-            this.translation = new Vector3(
-                nodeIdOrData.translation.x,
-                nodeIdOrData.translation.y,
-                nodeIdOrData.translation.z);
-            this.rotation = new Vector3(
-                nodeIdOrData.rotation.x,
-                nodeIdOrData.rotation.y,
-                nodeIdOrData.rotation.z);
-            this.scale = new Vector3(
-                nodeIdOrData.scale.x,
-                nodeIdOrData.scale.y,
-                nodeIdOrData.scale.z);
+            if(nodeIdOrData.translation){
+                this.translation = new Vector3(
+                    nodeIdOrData.translation.x,
+                    nodeIdOrData.translation.y,
+                    nodeIdOrData.translation.z);
+            }
+            if(nodeIdOrData.rotation){
+                this.rotation = new Vector3(
+                    nodeIdOrData.rotation.x,
+                    nodeIdOrData.rotation.y,
+                    nodeIdOrData.rotation.z);
+            }
+            if(nodeIdOrData.scale){
+                this.scale = new Vector3(
+                    nodeIdOrData.scale.x,
+                    nodeIdOrData.scale.y,
+                    nodeIdOrData.scale.z);
+            }
         }
     }
 

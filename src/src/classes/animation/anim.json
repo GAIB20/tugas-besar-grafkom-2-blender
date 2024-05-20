@@ -3,39 +3,12 @@
         {   
             "keyframes":[
                 {
-                    "nodeId": 20,
-                    "translation": {
-                        "x": 0,
-                        "y": 0,
-                        "z": 0
-                    },
+                    "nodeId": 1,
+                    
                     "rotation": {
                         "x": 0,
                         "y": 0,
                         "z": 0
-                    },
-                    "scale": {
-                        "x": 1,
-                        "y": 1,
-                        "z": 1
-                    }
-                },
-                {
-                    "nodeId": 22,
-                    "translation": {
-                        "x": 4,
-                        "y": 2,
-                        "z": 0
-                    },
-                    "rotation": {
-                        "x": 0,
-                        "y": 0,
-                        "z": 0
-                    },
-                    "scale": {
-                        "x": 2,
-                        "y": 1,
-                        "z": 1
                     }
                 }
             ]
@@ -44,40 +17,361 @@
         {
             "keyframes":[
                 {
-                    "nodeId": 20,
-                    "translation": {
-                        "x": 0,
-                        "y": 0,
-                        "z": 0
-                    },
+                    "nodeId": 1,
                     "rotation": {
-                        "x": 0,
+                        "x": 12,
                         "y": 0,
                         "z": 0
-                    },
-                    "scale": {
-                        "x": 2,
-                        "y": 2,
-                        "z": 2
                     }
-                },
+                }
+            ]
+        },
+        {
+            "keyframes":[
                 {
-                    "nodeId": 22,
-                    "translation": {
-                        "x": 4,
-                        "y": 2,
-                        "z": 0
-                    },
+                    "nodeId": 1,
                     "rotation": {
-                        "x": 0,
+                        "x": 24,
                         "y": 0,
                         "z": 0
-                    },
-                    "scale": {
-                        "x": 2,
-                        "y": 1,
-                        "z": 1
                     }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 36,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 48,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 60,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 72,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 84,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 96,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 108,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 120,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 132,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 144,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 156,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 168,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 180,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 192,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 204,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 216,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 228,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 240,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 252,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 264,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 276,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 288,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 300,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 312,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 324,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 336,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 348,
+                        "y": 0,
+                        "z": 0
+                    }
+                }
+            ]
+        },
+        {
+            "keyframes":[
+                {
+                    "nodeId": 1,
+                    "rotation": {
+                        "x": 360,
+                        "y": 0,
+                        "z": 0
+                    }
+                    
                 }
             ]
         }
