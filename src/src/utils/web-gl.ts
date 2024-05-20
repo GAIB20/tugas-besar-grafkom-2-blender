@@ -88,12 +88,8 @@ function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram
                     // Data Changed Time (note that buffer is already binded)
                     gl.bufferData(gl.ARRAY_BUFFER, v.data, gl.STATIC_DRAW);
                     v.consume();
-                    console.log("here")
-                    console.log(v.data)
                 }
                 gl.enableVertexAttribArray(loc);
-                console.log("tes1")
-                console.log({...v})
                 gl.vertexAttribPointer(loc, v.size, v.dtype, v.normalize, v.stride, v.offset);
             } else {
                 gl.disableVertexAttribArray(loc);
@@ -123,7 +119,6 @@ function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram
 function setAttribute(programInfo: ProgramInfo, attributeName: string, ...data: AttributeDataType) {
     const setters = programInfo.attributeSetters;
     const shaderName = `a_${attributeName}`;
-    console.log(shaderName, " w seetters ", setters)
     if (shaderName in setters) {
         setters[shaderName](...data);
     }

@@ -14,8 +14,8 @@ import {Node} from "./classes/node.ts";
 
 let playAnimationTime = 0;
 
-function playAnimation(currentTime : number) {
-    if(playAnimationTime === 0){
+function playAnimation(currentTime: number) {
+    if (playAnimationTime === 0) {
         playAnimationTime = currentTime;
     }
 
@@ -44,7 +44,10 @@ function main() {
     let rootNode: Node | null = null;
     let selectedNode: Node | null = null;
 
-    let selectedCamera = 'orthographic';
+    setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
+
+    const orthoCamera = setupCamera('orthographic', gl)
+    let selectedCamera = orthoCamera;
 
     const geometry = new BufferGeometry();
     geometry.setAttribute('position', new BufferAttribute(getGeometry(), 3))
@@ -54,7 +57,7 @@ function main() {
 
     const mesh = new Mesh('test', geometry, material)
 
-    mesh.translation = (new Vector3(45, 150, -200))
+    mesh.translation = (new Vector3(0, 0, 0))
     mesh.rotation = (new Vector3(degToRad(40), degToRad(180), degToRad(145)));
     mesh.scale = new Vector3(1, 1, 1);
 
@@ -68,12 +71,33 @@ function main() {
     rootNode = mesh;
     selectedNode = mesh
 
-    drawScene();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        drawScene();
+    });
 
     // Setup a ui.
-    setupSlider("#x", {name: "x", value: mesh.translation[0], slide: updatePosition(0), min: -gl.canvas.width, max: gl.canvas.width});
-    setupSlider("#y", {name: "y", value: mesh.translation[1], slide: updatePosition(1), min: -gl.canvas.height, max: gl.canvas.height});
-    setupSlider("#z", {name: "z", value: mesh.translation[2], slide: updatePosition(2), min: -gl.canvas.height, max: gl.canvas.height});
+    setupSlider("#x", {
+        name: "x",
+        value: mesh.translation[0],
+        slide: updatePosition(0),
+        min: -gl.canvas.width,
+        max: gl.canvas.width
+    });
+    setupSlider("#y", {
+        name: "y",
+        value: mesh.translation[1],
+        slide: updatePosition(1),
+        min: -gl.canvas.height,
+        max: gl.canvas.height
+    });
+    setupSlider("#z", {
+        name: "z",
+        value: mesh.translation[2],
+        slide: updatePosition(2),
+        min: -gl.canvas.height,
+        max: gl.canvas.height
+    });
     setupSlider("#angleX", {name: "angle-x", value: radToDeg(mesh.rotation[0]), slide: updateRotation(0), max: 360});
     setupSlider("#angleY", {name: "angle-y", value: radToDeg(mesh.rotation[1]), slide: updateRotation(1), max: 360});
     setupSlider("#angleZ", {name: "angle-z", value: radToDeg(mesh.rotation[2]), slide: updateRotation(2), max: 360});
@@ -106,18 +130,58 @@ function main() {
     });
 
 
-    // const originNode = new Node("origin");
+    const originNode = new Node("origin");
+    const canvas = document.getElementById("webgl-canvas")
+    if (!canvas) return;
+    originNode.add(orthoCamera)
+    orthoCamera.translation[2] = 200;
+
+    let isMouseDown = false;
+    let startX = 0;
+    let startY = 0;
+
+    function handleMouseDown(event: MouseEvent) {
+        isMouseDown = true;
+        startX = event.clientX;
+        startY = event.clientY;
+    }
+
+    function handleMouseMove(event: MouseEvent) {
+        if (!isMouseDown) return;
+
+        const currentX = event.clientX;
+        const currentY = event.clientY;
+        const deltaX = currentX - startX;
+        const deltaY = currentY - startY;
+
+        startX = currentX;
+        startY = currentY;
+
+        originNode.rotation[0] += (-deltaY/100);
+        originNode.rotation[1] += (-deltaX/100);
+        originNode.computeWorldMatrix();
+        orthoCamera.computeWorldMatrix();
+        drawScene()
+    }
+
+    function handleMouseUp() {
+        isMouseDown = false;
+    }
+
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mouseleave', handleMouseUp);
+
 
     const setSelectedNode = (node: Node) => {
         selectedNode = node;
     }
 
     const objectList = document.getElementById('objectList');
-    if(objectList !== null){
-        console.log('masuk');
+    if (objectList !== null) {
         createObjectHierarcy(rootNode, objectList, setSelectedNode);
-    }
-    else{
+    } else {
         console.error("Parent HTML Element is not found");
     }
 
@@ -151,14 +215,14 @@ function main() {
     function drawScene() {
         setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
 
-        let camera = setupCamera(selectedCamera, gl)
+        selectedCamera.computeWorldMatrix()
 
         let lastUsedProgramInfo: ProgramInfo | null = null;
         let lastUsedGeometry: BufferGeometry | null = null;
 
         if (!selectedNode || !rootNode || !basicProgramInfo || !phongProgramInfo) return
         calculateTransformation(selectedNode)
-        drawMesh(rootNode, camera, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
+        drawMesh(rootNode, selectedCamera, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
 
         const primitiveType = gl.TRIANGLES;
         const offset = 0;

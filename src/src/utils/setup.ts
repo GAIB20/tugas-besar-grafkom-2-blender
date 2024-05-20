@@ -31,12 +31,15 @@ export const setupCanvas = (canvas: HTMLCanvasElement, gl: WebGLRenderingContext
     gl.enable(gl.DEPTH_TEST);
 }
 
-export const setupCamera = (type: string, gl: WebGLRenderingContext): Camera | null => {
+export const setupCamera = (type: 'orthographic' | 'oblique' | 'perspective', gl: WebGLRenderingContext): Camera => {
     let camera = null;
     if (type === 'orthographic') {
         const near = 0;
         const far = -1000;
         camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, near, far);
+        camera.computeProjectionMatrix()
+    } else {
+        camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, -1, -500);
         camera.computeProjectionMatrix()
     }
     return camera
