@@ -28,10 +28,12 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
     value /= step;
 
     parent.innerHTML = `
-      <div class="gman-widget-outer">
+      <div class="flex flex-col">
         <div class="gman-widget-label">${name}</div>
-        <div class="gman-widget-value"></div>
+        <div class="flex gap-2">
         <input class="gman-widget-slider" type="range" min="${min}" max="${max}" value="${value}" />
+        <div class="gman-widget-value"></div>
+        </div>
       </div>
     `;
     let valueElem = parent.querySelector(".gman-widget-value");

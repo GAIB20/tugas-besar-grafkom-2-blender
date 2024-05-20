@@ -14,7 +14,7 @@ import {Node} from "./classes/node.ts";
 import {AnimationController} from "./classes/animation/animation-controller.ts";
 import {createButton} from "./utils/ui.ts";
 
-let playAnimationTime : number | undefined = undefined;
+let playAnimationTime: number | undefined = undefined;
 
 function main() {
     const _gl = setupContext();
@@ -67,21 +67,21 @@ function main() {
     console.log(selectedNode.idNode);
 
     const animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json');
-    const animButton = createButton(document.getElementById('rightContainer'), {name: "Play", onClick: () => {
-        if(animator.isPlaying()){
-            animator.stop();
-            if(animButton) animButton.textContent = "Play";
+    const animButton = createButton(document.getElementById('rightContainer'), {
+        name: "Play", onClick: () => {
+            if (animator.isPlaying()) {
+                animator.stop();
+                if (animButton) animButton.textContent = "Play";
+            } else {
+                animator.play();
+                requestAnimationFrame(playAnimation);
+                if (animButton) animButton.textContent = "Pause";
+            }
         }
-        else {
-            animator.play();
-            requestAnimationFrame(playAnimation);
-            if(animButton) animButton.textContent = "Pause";
-        }
-    }})
+    })
 
     console.log(selectedNode.idNode);
 
-    
 
     document.addEventListener('DOMContentLoaded', () => {
         drawScene();
@@ -89,29 +89,29 @@ function main() {
 
     // Setup a ui.
     setupSlider("#x", {
-        name: "x",
+        name: "Translate x",
         value: mesh.translation[0],
         slide: updatePosition(0),
         min: -gl.canvas.width,
         max: gl.canvas.width
     });
     setupSlider("#y", {
-        name: "y",
+        name: "Translate y",
         value: mesh.translation[1],
         slide: updatePosition(1),
         min: -gl.canvas.height,
         max: gl.canvas.height
     });
     setupSlider("#z", {
-        name: "z",
+        name: "Translate z",
         value: mesh.translation[2],
         slide: updatePosition(2),
         min: -gl.canvas.height,
         max: gl.canvas.height
     });
-    setupSlider("#angleX", {name: "angle-x", value: radToDeg(mesh.rotation[0]), slide: updateRotation(0), max: 360});
-    setupSlider("#angleY", {name: "angle-y", value: radToDeg(mesh.rotation[1]), slide: updateRotation(1), max: 360});
-    setupSlider("#angleZ", {name: "angle-z", value: radToDeg(mesh.rotation[2]), slide: updateRotation(2), max: 360});
+    setupSlider("#angleX", {name: "Rotate x", value: radToDeg(mesh.rotation[0]), slide: updateRotation(0), max: 360});
+    setupSlider("#angleY", {name: "Rotate y", value: radToDeg(mesh.rotation[1]), slide: updateRotation(1), max: 360});
+    setupSlider("#angleZ", {name: "Rotate z", value: radToDeg(mesh.rotation[2]), slide: updateRotation(2), max: 360});
     setupSlider("#scaleX", {
         value: mesh.scale[0],
         slide: updateScale(0),
@@ -119,7 +119,7 @@ function main() {
         max: 5,
         step: 0.01,
         precision: 2,
-        name: "scale-x",
+        name: "Scale x",
     });
     setupSlider("#scaleY", {
         value: mesh.scale[1],
@@ -128,7 +128,7 @@ function main() {
         max: 5,
         step: 0.01,
         precision: 2,
-        name: "scale-y",
+        name: "Scale y",
     });
     setupSlider("#scaleZ", {
         value: mesh.scale[2],
@@ -137,7 +137,7 @@ function main() {
         max: 5,
         step: 0.01,
         precision: 2,
-        name: "scale-z",
+        name: "Scale z",
     });
 
 
@@ -146,6 +146,14 @@ function main() {
     if (!canvas) return;
     originNode.add(orthoCamera)
     orthoCamera.translation[2] = 200;
+
+    setupSlider("#radiusCam", {
+        name: "Radius",
+        value: selectedCamera.translation[2],
+        slide: updateRadius(2),
+        min: 0,
+        max: 2000
+    });
 
     let isMouseDown = false;
     let startX = 0;
@@ -168,8 +176,8 @@ function main() {
         startX = currentX;
         startY = currentY;
 
-        originNode.rotation[0] += (-deltaY/100);
-        originNode.rotation[1] += (-deltaX/100);
+        originNode.rotation[0] += (-deltaY / 100);
+        originNode.rotation[1] += (-deltaX / 100);
         originNode.computeWorldMatrix();
         orthoCamera.computeWorldMatrix();
         drawScene()
@@ -194,7 +202,7 @@ function main() {
         drawScene();
 
         playAnimationTime = time;
-        if(animator.isPlaying()){
+        if (animator.isPlaying()) {
             requestAnimationFrame(playAnimation);
         }
     }
@@ -210,6 +218,13 @@ function main() {
         console.error("Parent HTML Element is not found");
     }
 
+    function updateRadius(index: number) {
+        if (!selectedCamera) return
+        return function (_event: any, ui: { value: number; }) {
+            selectedCamera!.translation[index] = ui.value;
+            drawScene();
+        };
+    }
 
     function updatePosition(index: number) {
         if (!selectedNode) return
