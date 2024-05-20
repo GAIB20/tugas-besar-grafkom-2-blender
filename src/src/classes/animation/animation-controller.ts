@@ -1,6 +1,5 @@
 import { Keyframe } from "./keyframe"
 import { Node } from "../node"
-import fs from 'fs';
 
 interface Frame {
     Keyframes: Keyframe[];
@@ -103,10 +102,10 @@ export class AnimationController {
     
     }
 
-    load(animFilePath : string) {
-        const data = fs.readFileSync(animFilePath, 'utf8');
-        return JSON.parse(data);
-    }
+    // load(animFilePath : string) {
+    //     const data = fs.readFileSync(animFilePath, 'utf8');
+    //     return JSON.parse(data);
+    // }
 
 
 }
