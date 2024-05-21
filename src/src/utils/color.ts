@@ -28,8 +28,8 @@ export function rgbToHex(rgba: [number, number, number, number]): string {
     let r = Math.round(rgba[0] * 255);
     let g = Math.round(rgba[1] * 255);
     let b = Math.round(rgba[2] * 255);
-    let a = Math.round(rgba[3] * 255);
+    // let a = Math.round(rgba[3] * 255);
 
     // Convert to a hexadecimal string
-    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase() + (a < 16 ? '0' : '') + a.toString(16).toUpperCase();
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 }

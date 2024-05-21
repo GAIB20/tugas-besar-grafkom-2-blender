@@ -48,6 +48,13 @@ export class Vector3 {
         return this
     }
 
+    mul(s: number) {
+        this[0] *=s;
+        this[1] *=s;
+        this[1] *=s;
+        return this
+    }
+
     subtract(v: Vector3) {
         this[0] -= v[0];
         this[1] -= v[1];

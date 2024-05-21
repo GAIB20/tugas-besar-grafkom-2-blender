@@ -6,6 +6,8 @@ import {BufferGeometry} from "../classes/buffer-geometry.ts";
 import {setAttributes, setUniform} from "./web-gl.ts";
 import {M4} from "../libs/m4.ts";
 import {Camera} from "../classes/camera.ts";
+import {Vector3} from "../libs/vector3.ts";
+import {PhongMaterial} from "../classes/phong-material.ts";
 
 export const cleanupObjects = (): void => {
     Node.nodes = []
@@ -14,7 +16,12 @@ export const cleanupObjects = (): void => {
 export const drawMesh = (mesh: Node, camera: Camera | null, gl: WebGLRenderingContext, basicProgramInfo: ProgramInfo, phongProgramInfo: ProgramInfo, lastUsedProgramInfo: ProgramInfo | null, lastUsedGeometry: BufferGeometry | null) => {
     if (!(mesh instanceof Mesh)) return
 
-    let meshProgramInfo = mesh.material instanceof BasicMaterial ? basicProgramInfo : phongProgramInfo;
+    mesh.geometry.calculateNormals(true)
+    // let meshProgramInfo = mesh.material instanceof BasicMaterial ? basicProgramInfo : phongProgramInfo;
+    let meshProgramInfo = phongProgramInfo;
+    if (mesh.material instanceof BasicMaterial) {
+        meshProgramInfo = basicProgramInfo;
+    }
     if (!meshProgramInfo) return;
 
     let bindBuffers = false;
@@ -31,9 +38,20 @@ export const drawMesh = (mesh: Node, camera: Camera | null, gl: WebGLRenderingCo
     }
 
     let projection = camera?.viewProjectionMatrix ?? M4.projection(gl.canvas.width, gl.canvas.height, 1000);
+    setUniform(meshProgramInfo, 'world', mesh.worldMatrix.matrix);
     projection = M4.multiply(projection, mesh.worldMatrix);
-    setUniform(meshProgramInfo, 'matrix', projection.matrix);
-    setUniform(meshProgramInfo, 'color', mesh.basicMaterial.uniforms['color'])
+    setUniform(meshProgramInfo, 'worldViewProjection', projection.matrix);
+    setUniform(meshProgramInfo, 'color', mesh.material.uniforms['color'])
+    if (mesh.material instanceof PhongMaterial) {
+        let light = new Vector3(0, 0, 1)
+        setUniform(meshProgramInfo, 'reverseLightDirection', light.normalize().toArray())
+        if (camera)
+            camera.computeWorldMatrix()
+        let viewWorld = camera ? [camera.worldMatrix[12], camera.worldMatrix[13], camera.worldMatrix[14]] : [0,0,0];
+        setUniform(meshProgramInfo, 'viewWorldPosition', viewWorld)
+        setUniform(meshProgramInfo, 'shininess', 300)
+        setUniform(meshProgramInfo, 'ambientColor', [0, 0, 0, 1])
+    }
 
     const primitiveType = gl.TRIANGLES;
     const offset = 0;

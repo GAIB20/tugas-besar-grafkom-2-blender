@@ -4,7 +4,6 @@ import {createObjectHierarcy, setupColorPicker, setupSlider} from "./utils/ui.ts
 import {Vector3} from "./libs/vector3.ts";
 import {setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
 import {BufferGeometry} from "./classes/buffer-geometry.ts";
-import {BufferAttribute} from "./classes/buffer-attribute.ts";
 import {basicFrag, basicVert} from "./shaders/basic.ts";
 import {BasicMaterial} from "./classes/basic-material.ts";
 import {Mesh} from "./classes/mesh.ts";
@@ -14,6 +13,9 @@ import {Node} from "./classes/node.ts";
 import {AnimationController} from "./classes/animation/animation-controller.ts";
 import {createButton} from "./utils/ui.ts";
 import {hexToRgb, rgbToHex} from "./utils/color.ts";
+import {phongFrag, phongVert} from "./shaders/phong.ts";
+import {PhongMaterial} from "./classes/phong-material.ts";
+import {CubeGeometry} from "./geometries/cube-geometry.ts";
 
 let playAnimationTime: number | undefined = undefined;
 
@@ -27,10 +29,10 @@ function main() {
     if (!basicFragmentShader || !basicVertexShader) return;
     let basicProgramInfo = createProgramInfo(gl, basicVertexShader, basicFragmentShader)
 
-    // let phongVertexShader = createShader(gl, gl.VERTEX_SHADER, phongVert);
-    // let phongFragmentShader = createShader(gl, gl.FRAGMENT_SHADER, phongFrag);
-    // if (!phongFragmentShader || !phongVertexShader) return;
-    let phongProgramInfo = createProgramInfo(gl, basicVertexShader, basicFragmentShader)
+    let phongVertexShader = createShader(gl, gl.VERTEX_SHADER, phongVert);
+    let phongFragmentShader = createShader(gl, gl.FRAGMENT_SHADER, phongFrag);
+    if (!phongFragmentShader || !phongVertexShader) return;
+    let phongProgramInfo = createProgramInfo(gl, phongVertexShader, phongFragmentShader)
 
     cleanupObjects();
 
@@ -43,20 +45,20 @@ function main() {
     const orthoCamera = setupCamera('orthographic', gl)
     let selectedCamera = orthoCamera;
 
-    const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new BufferAttribute(getGeometry(), 3))
+    const geometry = new CubeGeometry(100);
 
     const material = new BasicMaterial({color: [1, 0, 0, 1]})
+    const material2 = new PhongMaterial({color: [1, 0, 0, 1]})
 
-    const mesh = new Mesh('test', geometry, material)
-
+    const mesh = new Mesh('test', geometry, material, material2)
+    mesh.material = mesh.phongMaterial;
     mesh.translation = (new Vector3(0, 0, 0))
-    mesh.rotation = (new Vector3(degToRad(40), degToRad(180), degToRad(145)));
+    mesh.rotation = (new Vector3(degToRad(0), degToRad(0), degToRad(180)));
     mesh.scale = new Vector3(1, 1, 1);
 
-    const material2 = new BasicMaterial({color: [1, 0, 0, 1]})
 
-    const childMesh = new Mesh('child1', geometry, material2)
+    const childMesh = new Mesh('child1', geometry, material, material2)
+    childMesh.material = childMesh.phongMaterial;
     childMesh.translation = (new Vector3(100, 150, 0))
     childMesh.rotation = (new Vector3(degToRad(40), degToRad(180), degToRad(145)));
     childMesh.scale = new Vector3(1, 1, 1);
@@ -252,7 +254,7 @@ function main() {
     }
 
     // Material
-    let selectedMaterialOpt = 'basic';
+    let selectedMaterialOpt = 'phong';
     const materialSelect = document.getElementById('material') as HTMLSelectElement;
 
     function updateColor(type: string) {
@@ -261,6 +263,9 @@ function main() {
             if (!(selectedNode instanceof Mesh)) return
             if (type === 'basic') {
                 selectedNode.basicMaterial.color = hexToRgb(ui.value)
+            }
+            else {
+                selectedNode.phongMaterial.color = hexToRgb(ui.value)
             }
             drawScene();
         };
@@ -278,15 +283,26 @@ function main() {
                 picker: updateColor('basic')
             })
         }
+        else {
+            document.getElementById('basicProp')!.innerHTML = ''
+            selectedNode.material = selectedNode.phongMaterial;
+            setupColorPicker('#phongProp', {
+                name: "Color Phong",
+                value: rgbToHex(selectedNode.phongMaterial.color),
+                picker: updateColor('phong')
+            })
+        }
     }
 
     materialSelect.addEventListener('change', () => {
         setupMaterialProp()
+        drawScene()
     });
     document.addEventListener('DOMContentLoaded', () => {
         setupMaterialProp()
         drawScene()
     })
+    console.log()
 
     // Draw the scene.
     function drawScene() {
@@ -311,135 +327,5 @@ function main() {
     // requestAnimationFrame(drawScene);
 }
 
-function getGeometry() {
-    return new Float32Array([
-        // left column front
-        0, 0, 0,
-        0, 150, 0,
-        30, 0, 0,
-        0, 150, 0,
-        30, 150, 0,
-        30, 0, 0,
-
-        // top rung front
-        30, 0, 0,
-        30, 30, 0,
-        100, 0, 0,
-        30, 30, 0,
-        100, 30, 0,
-        100, 0, 0,
-
-        // middle rung front
-        30, 60, 0,
-        30, 90, 0,
-        67, 60, 0,
-        30, 90, 0,
-        67, 90, 0,
-        67, 60, 0,
-
-        // left column back
-        0, 0, 30,
-        30, 0, 30,
-        0, 150, 30,
-        0, 150, 30,
-        30, 0, 30,
-        30, 150, 30,
-
-        // top rung back
-        30, 0, 30,
-        100, 0, 30,
-        30, 30, 30,
-        30, 30, 30,
-        100, 0, 30,
-        100, 30, 30,
-
-        // middle rung back
-        30, 60, 30,
-        67, 60, 30,
-        30, 90, 30,
-        30, 90, 30,
-        67, 60, 30,
-        67, 90, 30,
-
-        // top
-        0, 0, 0,
-        100, 0, 0,
-        100, 0, 30,
-        0, 0, 0,
-        100, 0, 30,
-        0, 0, 30,
-
-        // top rung right
-        100, 0, 0,
-        100, 30, 0,
-        100, 30, 30,
-        100, 0, 0,
-        100, 30, 30,
-        100, 0, 30,
-
-        // under top rung
-        30, 30, 0,
-        30, 30, 30,
-        100, 30, 30,
-        30, 30, 0,
-        100, 30, 30,
-        100, 30, 0,
-
-        // between top rung and middle
-        30, 30, 0,
-        30, 60, 30,
-        30, 30, 30,
-        30, 30, 0,
-        30, 60, 0,
-        30, 60, 30,
-
-        // top of middle rung
-        30, 60, 0,
-        67, 60, 30,
-        30, 60, 30,
-        30, 60, 0,
-        67, 60, 0,
-        67, 60, 30,
-
-        // right of middle rung
-        67, 60, 0,
-        67, 90, 30,
-        67, 60, 30,
-        67, 60, 0,
-        67, 90, 0,
-        67, 90, 30,
-
-        // bottom of middle rung.
-        30, 90, 0,
-        30, 90, 30,
-        67, 90, 30,
-        30, 90, 0,
-        67, 90, 30,
-        67, 90, 0,
-
-        // right of bottom
-        30, 90, 0,
-        30, 150, 30,
-        30, 90, 30,
-        30, 90, 0,
-        30, 150, 0,
-        30, 150, 30,
-
-        // bottom
-        0, 150, 0,
-        0, 150, 30,
-        30, 150, 30,
-        0, 150, 0,
-        30, 150, 30,
-        30, 150, 0,
-
-        // left side
-        0, 0, 0,
-        0, 0, 30,
-        0, 150, 30,
-        0, 0, 0,
-        0, 150, 30,
-        0, 150, 0])
-}
 
 main();

@@ -14,11 +14,16 @@ export class PhongMaterial extends ShaderMaterial {
             vertexShader: phongVert,
             fragmentShader: phongFrag,
             uniforms: {
-                color: color || [0, 0, 0],
+                color: color || [0, 0, 0, 1],
             }
         })
         this.#color = this.uniforms['color'] as Color;
     }
 
     get color() { return this.#color; }
+
+    set color(color: [number, number, number, number]) {
+        this.#color = color;
+        this.uniforms['color'] = color;
+    }
 }
