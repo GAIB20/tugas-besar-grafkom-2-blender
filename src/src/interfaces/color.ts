@@ -1,1 +1,1 @@
-type Color = [number, number, number]
+type Color = [number, number, number, number]

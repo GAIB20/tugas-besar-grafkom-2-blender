@@ -22,7 +22,7 @@ export class BasicMaterial extends ShaderMaterial {
 
     get color() { return this.#color; }
 
-    set color(color: [number, number, number]) {
+    set color(color: [number, number, number, number]) {
         this.#color = color;
         this.uniforms['color'] = color;
     }

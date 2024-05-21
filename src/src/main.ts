@@ -46,7 +46,7 @@ function main() {
     const geometry = new BufferGeometry();
     geometry.setAttribute('position', new BufferAttribute(getGeometry(), 3))
 
-    const material = new BasicMaterial({color: [1, 0, 0]})
+    const material = new BasicMaterial({color: [1, 0, 0, 1]})
 
     const mesh = new Mesh('test', geometry, material)
 
@@ -54,7 +54,7 @@ function main() {
     mesh.rotation = (new Vector3(degToRad(40), degToRad(180), degToRad(145)));
     mesh.scale = new Vector3(1, 1, 1);
 
-    const material2 = new BasicMaterial({color: [1, 0, 0]})
+    const material2 = new BasicMaterial({color: [1, 0, 0, 1]})
 
     const childMesh = new Mesh('child1', geometry, material2)
     childMesh.translation = (new Vector3(100, 150, 0))
@@ -270,6 +270,7 @@ function main() {
         if (!(selectedNode instanceof Mesh)) return
         selectedMaterialOpt = materialSelect.value
         if (selectedMaterialOpt === 'basic') {
+            document.getElementById('phongProp')!.innerHTML = ''
             selectedNode.material = selectedNode.basicMaterial;
             setupColorPicker('#basicProp', {
                 name: "Color Basic",

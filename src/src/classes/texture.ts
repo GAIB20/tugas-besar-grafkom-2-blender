@@ -40,7 +40,7 @@ export class Texture {
     private _callbackFn?: Function;
     private _width: number = 0;
     private _height: number = 0;
-    private _defaultColor: Color = [1, 1, 1];
+    private _defaultColor: Color = [1, 1, 1, 1];
 
     public wrapS: ValueOf<typeof WrapMode> = WrapMode.Repeat;
     public wrapT: ValueOf<typeof WrapMode> = WrapMode.Repeat;
