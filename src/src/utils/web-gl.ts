@@ -3,9 +3,10 @@ import {
     AttributeMapSetters,
     AttributeSetters,
     AttributeSingleDataType,
-    ProgramInfo, UniformDataType, UniformMapSetters, UniformSetters, UniformSetterWebGLType, UniformTypes
+    ProgramInfo, UniformDataType, UniformMapSetters, UniformSetters, UniformSetterWebGLType
 } from "../types/web-gl.ts";
 import {BufferAttribute} from "../classes/buffer-attribute.ts";
+import {Texture} from "../classes/texture.ts";
 
 export function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
     let multiplier = 1;
@@ -132,54 +133,206 @@ export function setAttributes(
         setAttribute(programInfo, attributeName, attributes[attributeName]);
 }
 
-function createUniformSetters(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-): UniformMapSetters {
-    function createUniformSetter(info: WebGLActiveInfo): UniformSetters {
-        // Initialization Time
-        const loc = gl.getUniformLocation(program, info.name);
-        return (uniformType: UniformTypes, ...values) => {
-            const v = values[0];
-            if (Array.isArray(v)) {
-                // @ts-ignore
-                gl[`uniform${UniformSetterWebGLType[uniformType]}`](
-                    loc,
-                    false,
-                    v
-                );
-            } else {
-                // @ts-ignore
-                gl[`uniform${UniformSetterWebGLType[uniformType]}`](
-                    loc,
-                    ...values
-                );
+// function createUniformSetters(
+//     gl: WebGLRenderingContext,
+//     program: WebGLProgram
+// ): UniformMapSetters {
+//     function createUniformSetter(info: WebGLActiveInfo): UniformSetters {
+//         // Initialization Time
+//         const loc = gl.getUniformLocation(program, info.name);
+//         return (uniformType: UniformTypes, ...values) => {
+//             const v = values[0];
+//             if (Array.isArray(v)) {
+//                 // @ts-ignore
+//                 gl[`uniform${UniformSetterWebGLType[uniformType]}`](
+//                     loc,
+//                     false,
+//                     v
+//                 );
+//             } else {
+//                 // @ts-ignore
+//                 gl[`uniform${UniformSetterWebGLType[uniformType]}`](
+//                     loc,
+//                     ...values
+//                 );
+//             }
+//         };
+//     }
+//
+//     const uniformSetters: UniformMapSetters = {};
+//     const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+//     for (let i = 0; i < numUniforms; i++) {
+//         const info = gl.getActiveUniform(program, i);
+//         if (!info) continue;
+//         uniformSetters[info.name] = createUniformSetter(info);
+//     }
+//     return uniformSetters;
+// }
+//
+// export function setUniform(
+//     programInfo: ProgramInfo,
+//     uniformName: string,
+//     uniformType: UniformTypes,
+//     ...data: UniformDataType
+// ) {
+//     const uniforms = programInfo.uniformSetters;
+//     const shaderName = `u_${uniformName}`;
+//     if (shaderName in uniforms) {
+//         uniforms[shaderName](uniformType, ...data);
+//     }
+// }
+
+function isPowerOf2(value: number) {
+    return (value & (value - 1)) == 0;
+}
+function createUniformSetters(gl: WebGLRenderingContext, program: WebGLProgram): UniformMapSetters {
+    let textureUnit = 0; // Penghitung tekstur unit yang saat ini digunakan
+    function createUniformSetter(name: string, isArray: boolean, info: WebGLActiveInfo): UniformSetters {
+        // == Initialization Time
+        const loc = gl.getUniformLocation(program, name);
+        const type = UniformSetterWebGLType[info.type];
+        if (info.type == gl.SAMPLER_2D || info.type == gl.SAMPLER_CUBE) {
+            // Kasus tekstur
+            const unit = textureUnit; // Claim texture unit
+            textureUnit += info.size; // info.size > 1 kalau sampler array
+            // Fungsi setup tekstur
+            const setupTexture = (v: Texture) => {
+                v._texture = v._texture || gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, v._texture); // bind tekstur sementara
+                const isPOT = isPowerOf2(v.width) && isPowerOf2(v.height);
+                if (v.needsUpload) {
+                    // Jika butuh upload data, lakukan upload
+                    v.needsUpload = false;
+                    if (v.isLoaded) {
+                        // Sudah load, gaskan upload
+                        const param = [gl.TEXTURE_2D, 0, v.format, v.format, v.type, v.data];
+                        if (v.data instanceof Uint8Array) // insert w, h, border untuk array
+                            param.splice(3, 0, v.width, v.height, 0);
+                        // @ts-ignore: agak curang but hey less code it is :)
+                        gl.texImage2D(...param);
+                        if (isPOT) gl.generateMipmap(gl.TEXTURE_2D);
+                    } else {
+                        // Belum load / gak ada data
+                        gl.texImage2D(
+                            gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0,
+                            gl.RGBA, gl.UNSIGNED_BYTE,
+                            new Uint8Array(v.defaultColor)
+                        );
+                    }
+                }
+                if (v.parameterChanged) {
+                    // Jika parameter berubah, lakukan set parameter
+                    v.parameterChanged = false;
+                    if (!isPOT) {
+                        v.wrapS = v.wrapT = gl.CLAMP_TO_EDGE;
+                        v.minFilter = gl.LINEAR;
+                        console.log("image is not POT, fallback params", v);
+                    }
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S    , v.wrapS    );
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T    , v.wrapT    );
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, v.minFilter);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, v.magFilter);
+                }
+                gl.bindTexture(gl.TEXTURE_2D, null); // balikkan bind ke null
             }
-        };
+            const renderTexture = (v: Texture) => {
+                // Pilih tekstur unit, bind tekstur ke unit, set uniform sampler ke unit.
+                gl.activeTexture(gl.TEXTURE0 + unit);
+                gl.bindTexture(gl.TEXTURE_2D, v._texture);
+            }
+            const render = (v: any) => {
+                if (!(v instanceof Texture)) {
+                    console.error(`uniform ${info.name}: found not a Texture!`, v);
+                    return;
+                }
+                setupTexture(v); renderTexture(v);
+            }
+            return (v) => {
+                // == Render Time
+                if (isArray)
+                    if (Array.isArray(v)) {
+                        v.forEach(render);
+                        gl.uniform1iv(loc, v.map((_, i) => unit+i));
+                    }
+                    else console.error(
+                        `uniform ${info.name} is an array, but your data is not`)
+                else {
+                    render(v);
+                    gl.uniform1i(loc, unit);
+                }
+            };
+        } else {
+            return (v) => {
+                // == Render Time (akan dipanggil saat setUniform(nama, v))
+                // Disini diasumsikan bahwa v adalah number atau number[]
+                // Silahkan modifikasi sendiri jika ingin support untuk tipe lain
+                if (isArray) {
+                    // Uniform merupakan sebuah array e.g. uniform vec3 u_color[3];
+                    // v harus berupa array yang sudah di-flatten
+                    // e.g.  [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+                    //    -> [ 1, 0, 0,   0, 1, 0,   0, 0, 1]
+                    // @ts-ignore
+                    gl[`uniform${type}v`](loc, v);
+                } else {
+                    // Matriks (uniformMatrix[234]fv) memiliki argumen yang berbeda
+                    // Argumen kedua adalah transpose. Karena diasumsikan bahwa matriks
+                    // v dalam column major, maka transpose = 'false'.
+                    // Argumen kedua bisa diset 'true' jika matriks v dalam row major
+                    // ( atau lebih baik .transpose() manual sebelum set uniform,
+                    //   silahkan lihat Info Penting > Aturan Matriks )
+                    if (type.substr(0, 6) === 'Matrix')
+                        { // @ts-ignore
+                            gl[`uniform${type}`](loc, false, v);
+                        }
+                    else {
+                        // v bisa number atau number[]
+                        // Jika v array (uniform[234][fi]), gunakan spread
+                        // Jika tidak (uniform1[fi]), langsung pass nilai saja
+                        if (Array.isArray(v)) { // @ts-ignore
+                            gl[`uniform${type}`](loc, ...v);
+                        }
+                        else                  { // @ts-ignore
+                            gl[`uniform${type}`](loc,    v);
+                        }
+                    }
+                }
+            };
+        }
     }
 
-    const uniformSetters: UniformMapSetters = {};
+
+    const uniformSetters = {};
     const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
     for (let i = 0; i < numUniforms; i++) {
         const info = gl.getActiveUniform(program, i);
-        if (!info) continue;
-        uniformSetters[info.name] = createUniformSetter(info);
+        if (!info) break; // may break
+        let name = info.name; let isArray = false;
+        if (name.substr(-3) === '[0]') {
+            isArray = true;
+            name = name.substring(0, name.length - 3);
+        }
+        // @ts-ignore
+        uniformSetters[name] = createUniformSetter(name, isArray, info);
     }
     return uniformSetters;
 }
 
-export function setUniform(
-    programInfo: ProgramInfo,
-    uniformName: string,
-    uniformType: UniformTypes,
-    ...data: UniformDataType
-) {
-    const uniforms = programInfo.uniformSetters;
+
+export function setUniform(programInfo: ProgramInfo, uniformName: string, value: UniformDataType) {
+    const setters = programInfo.uniformSetters;
     const shaderName = `u_${uniformName}`;
-    if (shaderName in uniforms) {
-        uniforms[shaderName](uniformType, ...data);
+    if (shaderName in setters) {
+        setters[shaderName](value);
     }
 }
+export function setUniforms(
+    programInfo: ProgramInfo,
+    uniforms: {[uniformName: string]: UniformDataType},
+) {
+    for (let uniformName in uniforms)
+        setUniform(programInfo, uniformName, uniforms[uniformName]);
+}
+
 
 export function createProgramInfo(gl: WebGLRenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader): ProgramInfo | null {
     const program = createProgram(gl, vertexShader, fragmentShader)

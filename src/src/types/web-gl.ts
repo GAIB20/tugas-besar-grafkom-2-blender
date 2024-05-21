@@ -1,6 +1,7 @@
 import {BufferAttribute} from "../classes/buffer-attribute.ts";
 import {Vector3} from "../libs/vector3.ts";
 import {M4} from "../libs/m4.ts";
+import {Texture} from "../classes/texture.ts";
 
 export const ShaderType = {
     VERTEX: WebGLRenderingContext.VERTEX_SHADER,
@@ -38,7 +39,7 @@ export type AttributeDataType = [AttributeSingleDataType] | number[];
 export type AttributeSetters = (...v: AttributeDataType) => void;
 export type AttributeMapSetters = {[key: string]: AttributeSetters};
 
-export const UniformSetterWebGLType = {
+export const UniformSetterWebGLType: Record<number, string> = {
     [WebGLRenderingContext.FLOAT]: "1f",
     [WebGLRenderingContext.FLOAT_VEC2]: "2f",
     [WebGLRenderingContext.FLOAT_VEC3]: "3f",
@@ -58,8 +59,8 @@ export const UniformSetterWebGLType = {
 export type UniformTypes = keyof typeof UniformSetterWebGLType;
 
 export type UniformSingleDataType = Float32Array | number[] | M4 | Vector3 | [M4];
-export type UniformDataType = [UniformSingleDataType] | number[];
-export type UniformSetters = (uniformType: UniformTypes, ...v: UniformDataType) => void;
+export type UniformDataType = number | number[] | Texture | Texture[];
+export type UniformSetters = (v: UniformDataType) => void;
 export type UniformMapSetters = {[key: string]: UniformSetters};
 
 export type ProgramInfo = {
