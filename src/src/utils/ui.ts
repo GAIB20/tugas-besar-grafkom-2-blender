@@ -1,6 +1,16 @@
 import {Node} from '../classes/node.ts';
 
-export function setupSlider(selector: string, options: { name: any; precision?: number; min?: number; step?: number; value?: number; max?: number; slide?: any; uiPrecision?: undefined; uiMult?: number; }) {
+export function setupSlider(selector: string, options: {
+    name: any;
+    precision?: number;
+    min?: number;
+    step?: number;
+    value?: number;
+    max?: number;
+    slide?: any;
+    uiPrecision?: undefined;
+    uiMult?: number;
+}) {
     let parent = document.querySelector(selector);
     if (!parent) {
         // like jquery don't fail on a bad selector
@@ -12,7 +22,17 @@ export function setupSlider(selector: string, options: { name: any; precision?: 
     return createSlider(parent, options); // eslint-disable-line
 }
 
-export function createSlider(parent: { innerHTML: string; querySelector: (arg0: string) => any; }, options: { precision?: number; min?: number; step?: number; value?: number; max?: number; slide?: any; name: any; uiPrecision?: undefined; uiMult?: number; }) {
+export function createSlider(parent: { innerHTML: string; querySelector: (arg0: string) => any; }, options: {
+    precision?: number;
+    min?: number;
+    step?: number;
+    value?: number;
+    max?: number;
+    slide?: any;
+    name: any;
+    uiPrecision?: undefined;
+    uiMult?: number;
+}) {
     let precision = options.precision || 0;
     let min = options.min || 0;
     let step = options.step || 1;
@@ -48,7 +68,7 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
     function handleChange(event: { target: { value: string; }; }) {
         let value = parseInt(event.target.value);
         updateValue(value);
-        fn(event, { value: value * step });
+        fn(event, {value: value * step});
     }
 
     sliderElem.addEventListener('input', handleChange);
@@ -64,8 +84,66 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
     };
 }
 
+export function setupColorPicker(selector: string, options: { name: any; value: string, picker?: any }) {
+    console.log("tes")
+    let parent = document.querySelector(selector);
+    if (!parent) {
+        // like jquery don't fail on a bad selector
+        return;
+    }
+    if (!options.name) {
+        options.name = selector.substring(1);
+    }
+    return createColorPicker(parent, options); // eslint-disable-line
+}
+
+export function createColorPicker(parent: { innerHTML: string; querySelector: (arg0: string) => any; }, options: {
+    name: any;
+    value?: string;
+    picker?: any
+}) {
+    let name = options.name;
+    let value = options.value || '#000';
+    let fn = options.picker;
+
+    parent.innerHTML = `
+      <div class="flex flex-col">
+        <div class="gman-widget-label">${name}</div>
+        <div class="flex gap-2">
+        <input class="gman-widget-picker" type="color" value="${value}" />
+        <div class="gman-widget-value"></div>
+        </div>
+      </div>
+    `;
+    let valueElem = parent.querySelector(".gman-widget-value");
+    let pickerElem = parent.querySelector(".gman-widget-picker");
+
+    function updateValue(value: string) {
+        valueElem.textContent = value;
+    }
+
+    updateValue(value);
+
+    function handleChange(event: { target: { value: string; }; }) {
+        updateValue(event.target.value);
+        console.log(event.target.value);
+        fn(event, {value: event.target.value});
+    }
+
+    pickerElem.addEventListener('input', handleChange);
+    pickerElem.addEventListener('change', handleChange);
+
+    return {
+        elem: parent,
+        updateValue: (v: string) => {
+            pickerElem.value = v;
+            updateValue(v);
+        },
+    };
+}
+
 export function createButton(parent: HTMLElement | null, options: { name: any; onClick: any; }) {
-    if(parent != null){
+    if (parent != null) {
         let button = document.createElement('button');
         button.textContent = options.name;
         button.className = 'gman-widget-button';
@@ -78,20 +156,20 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
 
 }
 
-export function createObjectHierarcy(node : Node, parent: HTMLElement, setSelectedNode: (node: Node) => void){
-    const styleIl : string = 'inline-block p-4 bg-blue-600 text-white rounded';
-    const styleButton : string = 'inline-block p-1 px-2 mx-2 bg-green-500 text-white rounded hover:bg-green-700';
+export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelectedNode: (node: Node) => void) {
+    const styleIl: string = 'inline-block p-4 bg-blue-600 text-white rounded';
+    const styleButton: string = 'inline-block p-1 px-2 mx-2 bg-green-500 text-white rounded hover:bg-green-700';
     // const styleUl : string = 'fill-current';
 
-    if(parent === null){
+    if (parent === null) {
         throw new Error("Parent HTML Element is null");
     }
-    if(node.children.length === 0){
+    if (node.children.length === 0) {
         const il = document.createElement('il');
         il.innerHTML = node.name; // node.name
         il.className = styleIl;
         parent.appendChild(il);
-        
+
         const button = document.createElement('button');
         button.textContent = 'select';
         button.className = styleButton;
@@ -99,13 +177,12 @@ export function createObjectHierarcy(node : Node, parent: HTMLElement, setSelect
             setSelectedNode(node)
         })
         il.appendChild(button);
-    }
-    else{
+    } else {
         const il = document.createElement('il');
         il.innerHTML = node.name; // node.name
         il.className = styleIl;
         parent.appendChild(il);
-        
+
         const button = document.createElement('button');
         button.textContent = 'select';
         button.className = styleButton;

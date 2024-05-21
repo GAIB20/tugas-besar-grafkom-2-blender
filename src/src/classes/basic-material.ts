@@ -1,5 +1,4 @@
 import { basicVert, basicFrag } from "../shaders/basic";
-import { Color } from "./color";
 import { ShaderMaterial } from "./shader-material";
 
 type BasicMaterialOptions = {
@@ -15,11 +14,16 @@ export class BasicMaterial extends ShaderMaterial {
             vertexShader: basicVert,
             fragmentShader: basicFrag,
             uniforms: {
-                color: color || Color.white(),
+                color: color || [1.0, 1.0, 1.0],
             }
         })
         this.#color = this.uniforms['color'] as Color;
     }
 
     get color() { return this.#color; }
+
+    set color(color: [number, number, number]) {
+        this.#color = color;
+        this.uniforms['color'] = color;
+    }
 }

@@ -33,6 +33,7 @@ export const drawMesh = (mesh: Node, camera: Camera | null, gl: WebGLRenderingCo
     let projection = camera?.viewProjectionMatrix ?? M4.projection(gl.canvas.width, gl.canvas.height, 1000);
     projection = M4.multiply(projection, mesh.worldMatrix);
     setUniform(meshProgramInfo, 'matrix', gl.FLOAT_MAT4, projection.matrix);
+    setUniform(meshProgramInfo, 'color', gl.FLOAT_VEC3, ...mesh.basicMaterial.uniforms['color'])
 
     const primitiveType = gl.TRIANGLES;
     const offset = 0;

@@ -1,5 +1,7 @@
-type UniformType = Iterable<number>;
-type UniformSet<T = UniformType> = { [key: string]: T };
+import {UniformDataType} from "../types/web-gl.ts";
+
+// type UniformType = Iterable<number>;
+type UniformSet<T = UniformDataType> = { [key: string]: T };
 type ShaderMaterialOptions = {
     vertexShader: string;
     fragmentShader: string;
