@@ -1,5 +1,5 @@
-import {UniformSet} from "./shader-material.ts";
 import {Node} from "./node.ts"
+import {UniformSet} from "../types/web-gl.ts";
 
 type LightOptions = {
     color?: Color;

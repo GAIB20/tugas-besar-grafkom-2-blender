@@ -59,9 +59,10 @@ export const UniformSetterWebGLType: Record<number, string> = {
 export type UniformTypes = keyof typeof UniformSetterWebGLType;
 
 export type UniformSingleDataType = Float32Array | number[] | M4 | Vector3 | [M4];
-export type UniformDataType = number | number[] | Texture | Texture[];
+export type UniformDataType = number | number[] | Texture | boolean | Texture[];
 export type UniformSetters = (v: UniformDataType) => void;
 export type UniformMapSetters = {[key: string]: UniformSetters};
+export type UniformSet<T = UniformDataType> = { [key: string]: T };
 
 export type ProgramInfo = {
     program: WebGLProgram,
