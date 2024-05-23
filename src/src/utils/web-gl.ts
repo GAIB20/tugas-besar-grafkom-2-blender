@@ -233,7 +233,7 @@ function createUniformSetters(gl: WebGLRenderingContext, program: WebGLProgram):
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, v.minFilter);
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, v.magFilter);
                 }
-                gl.bindTexture(gl.TEXTURE_2D, null); // balikkan bind ke null
+                // gl.bindTexture(gl.TEXTURE_2D, null); // balikkan bind ke null
             }
             const renderTexture = (v: Texture) => {
                 // Pilih tekstur unit, bind tekstur ke unit, set uniform sampler ke unit.
@@ -322,6 +322,7 @@ export function setUniform(programInfo: ProgramInfo, uniformName: string, value:
     const setters = programInfo.uniformSetters;
     const shaderName = `u_${uniformName}`;
     if (shaderName in setters) {
+        // console.log({shaderName, setters})
         setters[shaderName](value);
     }
 }

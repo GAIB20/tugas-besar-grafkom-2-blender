@@ -74,6 +74,48 @@ export class CubeGeometry extends BufferGeometry {
         ];
 
         this.setAttribute('position', new BufferAttribute(new Float32Array(drawVertices), 3));
+
+        const uvs = [
+            // Front face
+            0, 0, 1, 0, 1, 1, 0, 1,
+            // Back face
+            0, 0, 0, 1, 1, 1, 1, 0,
+            // Top face
+            0, 1, 0, 0, 1, 0, 1, 1,
+            // Bottom face
+            0, 0, 1, 0, 1, 1, 0, 1,
+            // Right face
+            1, 0, 1, 1, 0, 1, 0, 0,
+            // Left face
+            0, 0, 1, 0, 1, 1, 0, 1,
+        ];
+
+        const drawUVs = [
+            // Front face
+            ...uvs.slice(0, 2), ...uvs.slice(2, 4), ...uvs.slice(4, 6),
+            ...uvs.slice(0, 2), ...uvs.slice(4, 6), ...uvs.slice(6, 8),
+
+            // Back face
+            ...uvs.slice(8, 10), ...uvs.slice(10, 12), ...uvs.slice(12, 14),
+            ...uvs.slice(8, 10), ...uvs.slice(12, 14), ...uvs.slice(14, 16),
+
+            // Top face
+            ...uvs.slice(16, 18), ...uvs.slice(18, 20), ...uvs.slice(20, 22),
+            ...uvs.slice(16, 18), ...uvs.slice(20, 22), ...uvs.slice(22, 24),
+
+            // Bottom face
+            ...uvs.slice(24, 26), ...uvs.slice(26, 28), ...uvs.slice(28, 30),
+            ...uvs.slice(24, 26), ...uvs.slice(28, 30), ...uvs.slice(30, 32),
+
+            // Right face
+            ...uvs.slice(32, 34), ...uvs.slice(34, 36), ...uvs.slice(36, 38),
+            ...uvs.slice(32, 34), ...uvs.slice(36, 38), ...uvs.slice(38, 40),
+
+            // Left face
+            ...uvs.slice(40, 42), ...uvs.slice(42, 44), ...uvs.slice(44, 46),
+            ...uvs.slice(40, 42), ...uvs.slice(44, 46), ...uvs.slice(46, 48),
+        ];
+        this.setAttribute('texcoord', new BufferAttribute(new Float32Array(drawUVs), 2));
         this.calculateNormals();
     }
 }

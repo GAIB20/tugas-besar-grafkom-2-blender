@@ -17,6 +17,7 @@ import {phongFrag, phongVert} from "./shaders/phong.ts";
 import {PhongMaterial} from "./classes/phong-material.ts";
 import {CubeGeometry} from "./geometries/cube-geometry.ts";
 import {DirectionalLight} from "./classes/directional-light.ts";
+import {Texture} from "./classes/texture.ts";
 
 let playAnimationTime: number | undefined = undefined;
 
@@ -49,7 +50,16 @@ function main() {
     const geometry = new CubeGeometry(100);
 
     const material = new BasicMaterial({color: [1, 0, 0, 1]})
-    const material2 = new PhongMaterial({color: [1, 0, 0, 1]})
+
+    const diffuseTexture = new Texture();
+    diffuseTexture.setData('/spiral/AmbientOcclusionMap.png')
+    const specularTexture = new Texture();
+    specularTexture.setData('/spiral/SpecularMap.png');
+    const material2 = new PhongMaterial({
+        color: [1, 0, 0, 1],
+        diffuseTexture: diffuseTexture,
+        specularTexture: specularTexture
+    })
 
     const mesh = new Mesh('test', geometry, material, material2)
     mesh.material = mesh.phongMaterial;
@@ -264,17 +274,13 @@ function main() {
             if (!(selectedNode instanceof Mesh)) return
             if (type === 'basic') {
                 selectedNode.basicMaterial.color = hexToRgb(ui.value)
-            }
-            else if (type === 'phongDiffuse') {
+            } else if (type === 'phongDiffuse') {
                 selectedNode.phongMaterial.color = hexToRgb(ui.value)
-            }
-            else if (type === 'phongAmbient') {
+            } else if (type === 'phongAmbient') {
                 selectedNode.phongMaterial.ambientColor = hexToRgb(ui.value)
-            }
-            else if (type === 'phongSpecular') {
+            } else if (type === 'phongSpecular') {
                 selectedNode.phongMaterial.specularColor = hexToRgb(ui.value)
-            }
-            else if (type === 'lightColor') {
+            } else if (type === 'lightColor') {
                 directionalLight.color = hexToRgb(ui.value)
             }
             drawScene();
@@ -301,8 +307,7 @@ function main() {
                 value: rgbToHex(selectedNode.basicMaterial.color),
                 picker: updateColor('basic')
             })
-        }
-        else {
+        } else {
             document.getElementById('basicProp')!.innerHTML = ''
             selectedNode.material = selectedNode.phongMaterial;
             setupColorPicker('#diffuseColor', {

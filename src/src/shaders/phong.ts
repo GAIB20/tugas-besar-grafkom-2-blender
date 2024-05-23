@@ -49,6 +49,7 @@
 export const phongVert = `
     attribute vec4 a_position;
     attribute vec3 a_normal;
+    attribute vec2 a_texcoord;
 
     uniform mat4 u_worldViewProjection;
     uniform mat4 u_world;
@@ -56,6 +57,7 @@ export const phongVert = `
 
     varying vec3 v_normal;
     varying vec3 v_surfaceToView;
+    varying vec2 v_texcoord;
 
     void main() {
       // Multiply the position by the matrix.
@@ -67,6 +69,8 @@ export const phongVert = `
       vec3 surfaceWorldPosition = (u_world * a_position).xyz;
       
       v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
+      
+      v_texcoord = a_texcoord;
     }`
 
 export const phongFrag = `
@@ -74,6 +78,7 @@ export const phongFrag = `
 
     varying vec3 v_normal;
     varying vec3 v_surfaceToView;
+    varying vec2 v_texcoord;
 
     uniform vec3 u_reverseLightDirection;
 
@@ -83,7 +88,9 @@ export const phongFrag = `
     uniform float u_shininess;
     uniform vec3 u_lightColor;
     uniform vec3 u_specularColor;
-
+    
+    uniform sampler2D u_diffuseTexture;
+    uniform sampler2D u_specularTexture;
 
     void main() {
        vec3 normal = normalize(v_normal);
@@ -97,15 +104,17 @@ export const phongFrag = `
       if (light > 0.0) {
         specular = max(pow(dot(normal, halfVector), u_shininess), 0.0);
       }
+      
+      vec4 diffuseTex = texture2D(u_diffuseTexture, v_texcoord);
+      gl_FragColor = u_ambientColor;
 
-       gl_FragColor = u_ambientColor;
-       
        // Lets multiply just the color portion (not the alpha)
        // by the light
-       gl_FragColor.rgb += (u_color.rgb * light * u_lightColor);
+       gl_FragColor.rgb += (diffuseTex.rgb * u_color.rgb * light * u_lightColor);
 
        // Just add in the specular
-      gl_FragColor.rgb += (specular * u_specularColor);
-      // gl_FragColor.rgb += (specular * vec3(1,0,0) * u_lightColor);
+       vec4 specularTex = texture2D(u_specularTexture, v_texcoord);
+       float specularGs = (specularTex.r + specularTex.g + specularTex.b) / 3.0;
+      gl_FragColor.rgb += (specular * u_specularColor * specularGs * u_lightColor);
     }`
 
