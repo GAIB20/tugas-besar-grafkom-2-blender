@@ -48,29 +48,51 @@
 
 export const phongVert = `
     attribute vec4 a_position;
+
     attribute vec3 a_normal;
+    attribute vec3 a_tangent;
+    attribute vec3 a_bitangent;
+
     attribute vec2 a_texcoord;
 
     uniform mat4 u_worldViewProjection;
     uniform mat4 u_world;
     uniform vec3 u_viewWorldPosition;
+    
+    uniform mat4 u_worldInverseTranspose;
+    
+    uniform sampler2D u_displacementTexture;
+    uniform float u_displacementFactor;
+    uniform float u_displacementBias;
 
     varying vec3 v_normal;
     varying vec3 v_surfaceToView;
     varying vec2 v_texcoord;
 
+    varying mat3 v_tbn;
+
     void main() {
-      // Multiply the position by the matrix.
-      gl_Position = u_worldViewProjection * a_position;
-     
       // orient the normals and pass to the fragment shader
-      v_normal = mat3(u_world) * a_normal;
+      v_normal = normalize(a_normal);
+      
+      float displacement = texture2D(u_displacementTexture, a_texcoord).r;
+      vec3 displacementPos = a_position.xyz + v_normal * (displacement * u_displacementFactor + u_displacementBias);
+    
+      // Multiply the position by the matrix.
+      // gl_Position = u_worldViewProjection * a_position;
+      gl_Position = u_worldViewProjection * vec4(displacementPos, 1.0);
       
       vec3 surfaceWorldPosition = (u_world * a_position).xyz;
       
       v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
       
       v_texcoord = a_texcoord;
+      
+      vec3 T = normalize(vec3(u_world * vec4(a_tangent, 0.0)));
+      vec3 B = normalize(vec3(u_world * vec4(a_bitangent, 0.0)));
+      vec3 N = normalize(vec3(u_world * vec4(a_normal, 0.0)));
+      
+      v_tbn = mat3(T, B, N);
     }`
 
 export const phongFrag = `
@@ -79,6 +101,8 @@ export const phongFrag = `
     varying vec3 v_normal;
     varying vec3 v_surfaceToView;
     varying vec2 v_texcoord;
+
+    varying mat3 v_tbn;
 
     uniform vec3 u_reverseLightDirection;
 
@@ -91,9 +115,14 @@ export const phongFrag = `
     
     uniform sampler2D u_diffuseTexture;
     uniform sampler2D u_specularTexture;
+    uniform sampler2D u_normalTexture;
 
     void main() {
-       vec3 normal = normalize(v_normal);
+       // vec3 normal = normalize(v_normal);
+       vec3 normal = texture2D(u_normalTexture, v_texcoord).rgb;
+       normal = normal -0.5;
+       normal = normalize(v_tbn * normal);
+       
        vec3 lightDirection = normalize(u_reverseLightDirection);
 
        float light = max(dot(normal, u_reverseLightDirection), 0.0);
@@ -114,7 +143,7 @@ export const phongFrag = `
 
        // Just add in the specular
        vec4 specularTex = texture2D(u_specularTexture, v_texcoord);
-       float specularGs = (specularTex.r + specularTex.g + specularTex.b) / 3.0;
-      gl_FragColor.rgb += (specular * u_specularColor * specularGs * u_lightColor);
+       // float specularGs = (specularTex.r + specularTex.g + specularTex.b) / 3.0;
+      gl_FragColor.rgb += (specular * u_specularColor * specularTex.r);
     }`
 

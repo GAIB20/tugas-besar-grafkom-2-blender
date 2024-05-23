@@ -1,5 +1,5 @@
 export class Vector3 {
-    constructor(public x: number = 0, public y: number = 0, public z: number = 0) {
+    constructor(x: number = 0, y: number = 0, z: number = 0) {
         this[0] = x;
         this[1] = y;
         this[2] = z;
@@ -10,6 +10,13 @@ export class Vector3 {
 
     get length(): number {
         return 3;
+    }
+
+    set(v: number[]) {
+        this[0] = v[0];
+        this[1] = v[1];
+        this[2] = v[2];
+        return this;
     }
 
     isEqual(vector3: Vector3) {
@@ -55,11 +62,35 @@ export class Vector3 {
         return this
     }
 
+    static multiply(v: Vector3, s: number) {
+        let result = new Vector3()
+        result[0] = v[0] * s;
+        result[1] = v[1] * s;
+        result[2] = v[2] * s;
+        return result
+    }
+
     subtract(v: Vector3) {
         this[0] -= v[0];
         this[1] -= v[1];
         this[2] -= v[2];
 
         return this
+    }
+
+    static sub(v1: Vector3, v2: Vector3) {
+        let result = new Vector3();
+        result[0] = v1[0] - v2[0];
+        result[1] = v1[1] - v2[1];
+        result[2] = v1[2] - v2[2];
+        return result;
+    }
+
+    static add(v1: Vector3, v2: Vector3) {
+        let result = new Vector3();
+        result[0] = v1[0] + v2[0];
+        result[1] = v1[1] + v2[1];
+        result[2] = v1[2] + v2[2];
+        return result;
     }
 }

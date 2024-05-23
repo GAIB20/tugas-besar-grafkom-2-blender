@@ -9,6 +9,10 @@ type PhongMaterialOptions = {
     specularColor?: Color;
     diffuseTexture: Texture;
     specularTexture: Texture;
+    normalTexture: Texture;
+    displacementTexture: Texture;
+    displacementFactor?: number;
+    displacementBias?: number;
 }
 
 export class PhongMaterial extends ShaderMaterial {
@@ -20,8 +24,13 @@ export class PhongMaterial extends ShaderMaterial {
     #diffuseTexture: Texture;
     #specularTexture: Texture;
 
+    #normalTexture: Texture;
+    #displacementTexture: Texture;
+    #displacementFactor: number;
+    #displacementBias: number;
+
     constructor(options: PhongMaterialOptions) {
-        const {color, shininess, ambientColor, specularColor, diffuseTexture, specularTexture} = options || {};
+        const {color, shininess, ambientColor, specularColor, diffuseTexture, specularTexture, normalTexture, displacementTexture, displacementFactor, displacementBias} = options || {};
         super({
             vertexShader: phongVert,
             fragmentShader: phongFrag,
@@ -30,8 +39,12 @@ export class PhongMaterial extends ShaderMaterial {
                 shininess: shininess || 100,
                 ambientColor: ambientColor || [0, 0, 0, 1],
                 specularColor: specularColor || [1, 1, 1, 1],
+                displacementTexture: displacementTexture,
+                displacementFactor: displacementFactor || 100,
+                displacementBias: displacementBias || -60,
                 diffuseTexture: diffuseTexture,
-                specularTexture: specularTexture
+                specularTexture: specularTexture,
+                normalTexture: normalTexture,
             }
         })
         this.#color = this.uniforms['color'] as Color;
@@ -40,6 +53,10 @@ export class PhongMaterial extends ShaderMaterial {
         this.#specularColor = this.uniforms['specularColor'] as Color;
         this.#diffuseTexture = this.uniforms['diffuseTexture'] as Texture;
         this.#specularTexture = this.uniforms['specularTexture'] as Texture;
+        this.#normalTexture = this.uniforms['normalTexture'] as Texture;
+        this.#displacementTexture = this.uniforms['displacementTexture'] as Texture;
+        this.#displacementFactor = this.uniforms['displacementFactor'] as number;
+        this.#displacementBias = this.uniforms['displacementBias'] as number;
     }
 
     get color() {
@@ -63,6 +80,22 @@ export class PhongMaterial extends ShaderMaterial {
     }
     get specularTexture() {
         return this.#specularTexture
+    }
+
+    get normalTexture() {
+        return this.#normalTexture
+    }
+
+    get displacementTexture() {
+        return this.#displacementTexture
+    }
+
+    get displacementFactor() {
+        return this.#displacementFactor
+    }
+
+    get displacementBias() {
+        return this.#displacementBias
     }
 
     set color(color: [number, number, number, number]) {
@@ -93,5 +126,25 @@ export class PhongMaterial extends ShaderMaterial {
     set specularTexture(texture: Texture) {
         this.#specularTexture = texture;
         this.uniforms['specularTexture'] = texture;
+    }
+
+    set normalTexture(texture: Texture) {
+        this.#normalTexture = texture;
+        this.uniforms['normalTexture'] = texture;
+    }
+
+    set displacementTexture(texture: Texture) {
+        this.#displacementTexture = texture;
+        this.uniforms['displacementTexture'] = texture;
+    }
+
+    set displacementFactor(factor: number) {
+        this.#displacementFactor = factor;
+        this.uniforms['displacementFactor'] = factor;
+    }
+
+    set displacementBias(bias: number) {
+        this.#displacementBias = bias;
+        this.uniforms['displacementBias'] = bias;
     }
 }

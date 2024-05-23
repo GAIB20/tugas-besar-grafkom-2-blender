@@ -116,8 +116,9 @@ export class BufferAttribute {
         // Set elemen[index] dengan data (data.length == this._size)
         // Jangan lupa untuk menyesuaikan dengan offset dan stride.
         //TODO: check offset and stride
+        index *= this._size;
         for (let i = 0; i < data.length; i++) {
-            this._data[index + this.offset + (this._stride * index * this._size) + i] = data[i];
+            this._data[index + i] = data[i];
         }
     }
 
@@ -125,12 +126,12 @@ export class BufferAttribute {
     get(index: number, size?: number) {
         index *= this._size;
         if (!size) size = this._size;
-        const data: number[] = [];
+        const data: number[] = new Array(size);
         // Ambil elemen[index] ke data (data.length == size)
         // Jangan lupa untuk menyesuaikan dengan offset dan stride.
         //TODO: check offset and stride
         for (let i = 0; i < size; i++) {
-            data[i] = this._data[index + this.offset + (this._stride * index * this._size) + i];
+            data[i] = this._data[index + i];
         }
         return data;
     }

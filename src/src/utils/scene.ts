@@ -16,7 +16,7 @@ export const cleanupObjects = (): void => {
 export const drawMesh = (mesh: Node, camera: Camera | null, light: DirectionalLight, gl: WebGLRenderingContext, basicProgramInfo: ProgramInfo, phongProgramInfo: ProgramInfo, lastUsedProgramInfo: ProgramInfo | null, lastUsedGeometry: BufferGeometry | null) => {
     if (!(mesh instanceof Mesh)) return
 
-    mesh.geometry.calculateNormals(true)
+    mesh.geometry.calculateNormals()
     // let meshProgramInfo = mesh.material instanceof BasicMaterial ? basicProgramInfo : phongProgramInfo;
     let meshProgramInfo = phongProgramInfo;
     if (mesh.material instanceof BasicMaterial) {

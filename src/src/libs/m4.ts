@@ -54,6 +54,27 @@ export class M4 {
         return m4;
     }
 
+    static transpose(m: M4): M4 {
+        const result = new M4();
+        result[0] = m[0];
+        result[1] = m[4];
+        result[2] = m[8];
+        result[3] = m[12];
+        result[4] = m[1];
+        result[5] = m[5];
+        result[6] = m[9];
+        result[7] = m[13];
+        result[8] = m[2];
+        result[9] = m[6];
+        result[10] = m[10];
+        result[11] = m[14];
+        result[12] = m[3];
+        result[13] = m[7];
+        result[14] = m[11];
+        result[15] = m[15];
+        return result;
+    }
+
     static rotationY(angleInRadians: number): M4 {
         const m4 = M4.identity();
         const c = Math.cos(angleInRadians);
@@ -152,6 +173,8 @@ export class M4 {
         }
         return clonedM4;
     }
+
+
 
     static inverse(m: M4): M4 {
         let m00 = m[0 * 4 + 0];

@@ -1,5 +1,5 @@
 import './style.css'
-import {createProgramInfo, createShader, degToRad, radToDeg} from "./utils/web-gl.ts";
+import {createProgramInfo, createShader, degToRad, radToDeg, resizeCanvasToDisplaySize} from "./utils/web-gl.ts";
 import {createObjectHierarcy, setupColorPicker, setupSlider} from "./utils/ui.ts";
 import {Vector3} from "./libs/vector3.ts";
 import {setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
@@ -15,9 +15,9 @@ import {createButton} from "./utils/ui.ts";
 import {hexToRgb, rgbToHex} from "./utils/color.ts";
 import {phongFrag, phongVert} from "./shaders/phong.ts";
 import {PhongMaterial} from "./classes/phong-material.ts";
-import {CubeGeometry} from "./geometries/cube-geometry.ts";
 import {DirectionalLight} from "./classes/directional-light.ts";
 import {Texture} from "./classes/texture.ts";
+import BoxGeometry from "./geometries/box-geometry.ts";
 
 let playAnimationTime: number | undefined = undefined;
 
@@ -42,12 +42,13 @@ function main() {
     let rootNode: Node | null = null;
     let selectedNode: Node | null = null;
 
-    setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
+    resizeCanvasToDisplaySize(<HTMLCanvasElement>gl.canvas);
 
     const orthoCamera = setupCamera('orthographic', gl)
     let selectedCamera = orthoCamera;
 
-    const geometry = new CubeGeometry(100);
+    // const geometry = new CubeGeometry(100);
+    const geometry = new BoxGeometry(150, 150, 150, 30);
 
     const material = new BasicMaterial({color: [1, 0, 0, 1]})
 
@@ -55,10 +56,16 @@ function main() {
     diffuseTexture.setData('/spiral/AmbientOcclusionMap.png')
     const specularTexture = new Texture();
     specularTexture.setData('/spiral/SpecularMap.png');
+    const normalTexture = new Texture();
+    normalTexture.setData('/spiral/NormalMap.png')
+    const displacementTexture = new Texture();
+    displacementTexture.setData('/spiral/DisplacementMap.png')
     const material2 = new PhongMaterial({
         color: [1, 0, 0, 1],
         diffuseTexture: diffuseTexture,
-        specularTexture: specularTexture
+        specularTexture: specularTexture,
+        normalTexture: normalTexture,
+        displacementTexture: displacementTexture
     })
 
     const mesh = new Mesh('test', geometry, material, material2)
@@ -79,11 +86,6 @@ function main() {
     rootNode = mesh;
     selectedNode = mesh
 
-    console.log(selectedNode.idNode);
-    if (selectedNode instanceof Mesh) {
-        console.log(selectedNode.basicMaterial.uniforms)
-    }
-
     const animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json');
     const animButton = createButton(document.getElementById('rightContainer'), {
         name: "Play", onClick: () => {
@@ -97,8 +99,6 @@ function main() {
             }
         }
     })
-
-    console.log(selectedNode.idNode);
 
     // Setup a ui.
     setupSlider("#x", {
@@ -287,11 +287,13 @@ function main() {
         };
     }
 
-    function updateShininess() {
+    function updateMaterialProp(type: 'shininess' | 'dispFactor' | 'dispBias') {
         if (!selectedNode) return
         return function (_event: any, ui: { value: number; }) {
             if (!(selectedNode instanceof Mesh)) return
-            selectedNode.phongMaterial.shininess = ui.value
+            if (type === 'shininess') {
+                selectedNode.phongMaterial.shininess = ui.value
+            }
             drawScene();
         };
     }
@@ -327,7 +329,7 @@ function main() {
             })
             setupSlider("#shininess", {
                 value: selectedNode.phongMaterial.shininess,
-                slide: updateShininess(),
+                slide: updateMaterialProp('shininess'),
                 min: 1,
                 max: 300,
                 step: 1,
