@@ -77,4 +77,10 @@ export class BufferGeometry {
             normal: this.getAttribute('normal').id
         }
     }
+
+    setDirty() {
+        for (let attr in Object.values(this._attributes)) {
+            this._attributes[attr].isDirty = true;
+        }
+    }
 }

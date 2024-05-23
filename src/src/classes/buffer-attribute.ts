@@ -79,6 +79,10 @@ export class BufferAttribute {
         this._isDirty = true;
     }
 
+    set isDirty(isDirty: boolean) {
+        this._isDirty = isDirty;
+    }
+
 
     /**
      * Tandai buffer sebagai bersih

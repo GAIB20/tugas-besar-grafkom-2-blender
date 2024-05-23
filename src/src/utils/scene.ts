@@ -3,7 +3,7 @@ import {Mesh} from "../classes/mesh.ts";
 import {BasicMaterial} from "../classes/basic-material.ts";
 import {ProgramInfo} from "../types/web-gl.ts";
 import {BufferGeometry} from "../classes/buffer-geometry.ts";
-import {setAttributes, setUniform} from "./web-gl.ts";
+import {setAttributes, setUniform, setUniforms} from "./web-gl.ts";
 import {M4} from "../libs/m4.ts";
 import {Camera} from "../classes/camera.ts";
 import {Vector3} from "../libs/vector3.ts";
@@ -34,23 +34,24 @@ export const drawMesh = (mesh: Node, camera: Camera | null, gl: WebGLRenderingCo
 
     if (bindBuffers || lastUsedGeometry !== mesh.geometry) {
         lastUsedGeometry = mesh.geometry;
+        // mesh.geometry.setDirty();
         setAttributes(meshProgramInfo, mesh.geometry.attributes);
     }
 
     let projection = camera?.viewProjectionMatrix ?? M4.projection(gl.canvas.width, gl.canvas.height, 1000);
-    setUniform(meshProgramInfo, 'world', mesh.worldMatrix.matrix);
     projection = M4.multiply(projection, mesh.worldMatrix);
     setUniform(meshProgramInfo, 'worldViewProjection', projection.matrix);
-    setUniform(meshProgramInfo, 'color', mesh.material.uniforms['color'])
+    // setUniform(meshProgramInfo, 'color', mesh.material.uniforms['color'])
+    setUniforms(meshProgramInfo, mesh.material.uniforms)
     if (mesh.material instanceof PhongMaterial) {
+        setUniform(meshProgramInfo, 'world', mesh.worldMatrix.matrix);
         let light = new Vector3(0, 0, 1)
         setUniform(meshProgramInfo, 'reverseLightDirection', light.normalize().toArray())
         if (camera)
             camera.computeWorldMatrix()
         let viewWorld = camera ? [camera.worldMatrix[12], camera.worldMatrix[13], camera.worldMatrix[14]] : [0,0,0];
         setUniform(meshProgramInfo, 'viewWorldPosition', viewWorld)
-        setUniform(meshProgramInfo, 'shininess', 300)
-        setUniform(meshProgramInfo, 'ambientColor', [0, 0, 0, 1])
+        setUniform(meshProgramInfo, 'lightColor', [1, 1, 1, 1])
     }
 
     const primitiveType = gl.TRIANGLES;

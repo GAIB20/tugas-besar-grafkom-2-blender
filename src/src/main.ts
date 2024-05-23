@@ -264,9 +264,24 @@ function main() {
             if (type === 'basic') {
                 selectedNode.basicMaterial.color = hexToRgb(ui.value)
             }
-            else {
+            else if (type === 'phongDiffuse') {
                 selectedNode.phongMaterial.color = hexToRgb(ui.value)
             }
+            else if (type === 'phongAmbient') {
+                selectedNode.phongMaterial.ambientColor = hexToRgb(ui.value)
+            }
+            else if (type === 'phongSpecular') {
+                selectedNode.phongMaterial.specularColor = hexToRgb(ui.value)
+            }
+            drawScene();
+        };
+    }
+
+    function updateShininess() {
+        if (!selectedNode) return
+        return function (_event: any, ui: { value: number; }) {
+            if (!(selectedNode instanceof Mesh)) return
+            selectedNode.phongMaterial.shininess = ui.value
             drawScene();
         };
     }
@@ -286,11 +301,29 @@ function main() {
         else {
             document.getElementById('basicProp')!.innerHTML = ''
             selectedNode.material = selectedNode.phongMaterial;
-            setupColorPicker('#phongProp', {
-                name: "Color Phong",
+            setupColorPicker('#diffuseColor', {
+                name: "Diffuse Color",
                 value: rgbToHex(selectedNode.phongMaterial.color),
-                picker: updateColor('phong')
+                picker: updateColor('phongDiffuse')
             })
+            setupColorPicker('#ambientColor', {
+                name: "Ambient Color",
+                value: rgbToHex(selectedNode.phongMaterial.ambientColor),
+                picker: updateColor('phongAmbient')
+            })
+            setupColorPicker('#specularColor', {
+                name: "Specular Color",
+                value: rgbToHex(selectedNode.phongMaterial.specularColor),
+                picker: updateColor('phongSpecular')
+            })
+            setupSlider("#shininess", {
+                value: selectedNode.phongMaterial.shininess,
+                slide: updateShininess(),
+                min: 1,
+                max: 300,
+                step: 1,
+                name: "Shininess",
+            });
         }
     }
 
@@ -302,7 +335,6 @@ function main() {
         setupMaterialProp()
         drawScene()
     })
-    console.log()
 
     // Draw the scene.
     function drawScene() {

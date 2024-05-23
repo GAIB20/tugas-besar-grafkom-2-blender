@@ -81,6 +81,9 @@ export const phongFrag = `
     uniform vec4 u_color;
 
     uniform float u_shininess;
+    uniform vec3 u_lightColor;
+    uniform vec3 u_specularColor;
+
 
     void main() {
        vec3 normal = normalize(v_normal);
@@ -99,9 +102,10 @@ export const phongFrag = `
        
        // Lets multiply just the color portion (not the alpha)
        // by the light
-       gl_FragColor.rgb += (u_color.rgb * light);
+       gl_FragColor.rgb += (u_color.rgb * light * u_lightColor);
 
        // Just add in the specular
-      gl_FragColor.rgb += specular;
+      gl_FragColor.rgb += (specular * u_specularColor);
+      // gl_FragColor.rgb += (specular * vec3(1,0,0) * u_lightColor);
     }`
 
