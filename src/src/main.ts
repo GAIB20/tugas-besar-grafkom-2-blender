@@ -53,13 +53,17 @@ function main() {
     const material = new BasicMaterial({color: [1, 0, 0, 1]})
 
     const diffuseTexture = new Texture();
-    diffuseTexture.setData('/spiral/AmbientOcclusionMap.png')
+    diffuseTexture.setData('/spiral/diffuse.png')
+    diffuseTexture.onLoad(() => drawScene())
     const specularTexture = new Texture();
-    specularTexture.setData('/spiral/SpecularMap.png');
+    specularTexture.setData('/spiral/specular.png');
+    specularTexture.onLoad(() => drawScene())
     const normalTexture = new Texture();
-    normalTexture.setData('/spiral/NormalMap.png')
+    normalTexture.setData('/spiral/normal-map.png')
+    normalTexture.onLoad(() => drawScene())
     const displacementTexture = new Texture();
-    displacementTexture.setData('/spiral/DisplacementMap.png')
+    displacementTexture.setData('/spiral/displacement-map.png')
+    displacementTexture.onLoad(() => drawScene())
     const material2 = new PhongMaterial({
         color: [1, 0, 0, 1],
         diffuseTexture: diffuseTexture,
@@ -293,6 +297,10 @@ function main() {
             if (!(selectedNode instanceof Mesh)) return
             if (type === 'shininess') {
                 selectedNode.phongMaterial.shininess = ui.value
+            } else if (type === 'dispFactor') {
+                selectedNode.phongMaterial.displacementFactor = ui.value
+            } else if (type === 'dispBias') {
+                selectedNode.phongMaterial.displacementBias = ui.value
             }
             drawScene();
         };
@@ -335,6 +343,22 @@ function main() {
                 step: 1,
                 name: "Shininess",
             });
+            setupSlider("#displacementFactor", {
+                value: selectedNode.phongMaterial.displacementFactor,
+                slide: updateMaterialProp('dispFactor'),
+                min: 1,
+                max: 300,
+                step: 1,
+                name: "Displacement Factor",
+            });
+            setupSlider("#displacementBias", {
+                value: selectedNode.phongMaterial.displacementBias,
+                slide: updateMaterialProp('dispBias'),
+                min: -100,
+                max: 100,
+                step: 1,
+                name: "Displacement Bias",
+            });
         }
     }
 
@@ -344,6 +368,33 @@ function main() {
     });
     document.addEventListener('DOMContentLoaded', () => {
         setupMaterialProp()
+        drawScene()
+    })
+
+    // Texture
+    const diffTextureSelect = document.getElementById('diffuseTexture') as HTMLSelectElement;
+    const specTextureSelect = document.getElementById('specularTexture') as HTMLSelectElement;
+    const normalTextureSelect = document.getElementById('normalTexture') as HTMLSelectElement;
+    const dispTextureSelect = document.getElementById('displacementTexture') as HTMLSelectElement;
+
+    diffTextureSelect.addEventListener('change', () => {
+        let path = diffTextureSelect.value === 'blank' ? '/blank/blank.png' : `/${diffTextureSelect.value}/diffuse.png`
+        diffuseTexture.setData(path);
+        drawScene()
+    })
+    specTextureSelect.addEventListener('change', () => {
+        let path = specTextureSelect.value === 'blank' ? '/blank/blank.png' : `/${specTextureSelect.value}/specular.png`
+        specularTexture.setData(path);
+        drawScene()
+    })
+    normalTextureSelect.addEventListener('change', () => {
+        let path = normalTextureSelect.value === 'blank' ? '/blank/blank-normal.png' : `/${normalTextureSelect.value}/normal-map.png`
+        normalTexture.setData(path);
+        drawScene()
+    })
+    dispTextureSelect.addEventListener('change', () => {
+        let path = dispTextureSelect.value === 'blank' ? '/blank/blank-displacement.png' : `/${dispTextureSelect.value}/displacement-map.png`
+        displacementTexture.setData(path);
         drawScene()
     })
 

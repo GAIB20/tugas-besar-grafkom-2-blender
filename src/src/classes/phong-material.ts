@@ -7,10 +7,10 @@ type PhongMaterialOptions = {
     shininess?: number;
     ambientColor?: Color;
     specularColor?: Color;
-    diffuseTexture: Texture;
-    specularTexture: Texture;
-    normalTexture: Texture;
-    displacementTexture: Texture;
+    diffuseTexture?: Texture;
+    specularTexture?: Texture;
+    normalTexture?: Texture;
+    displacementTexture?: Texture;
     displacementFactor?: number;
     displacementBias?: number;
 }
@@ -29,8 +29,9 @@ export class PhongMaterial extends ShaderMaterial {
     #displacementFactor: number;
     #displacementBias: number;
 
-    constructor(options: PhongMaterialOptions) {
+    constructor(options?: PhongMaterialOptions) {
         const {color, shininess, ambientColor, specularColor, diffuseTexture, specularTexture, normalTexture, displacementTexture, displacementFactor, displacementBias} = options || {};
+        let blankTexture = Texture.getBlankDisplacementMap();
         super({
             vertexShader: phongVert,
             fragmentShader: phongFrag,
@@ -39,12 +40,12 @@ export class PhongMaterial extends ShaderMaterial {
                 shininess: shininess || 100,
                 ambientColor: ambientColor || [0, 0, 0, 1],
                 specularColor: specularColor || [1, 1, 1, 1],
-                displacementTexture: displacementTexture,
+                displacementTexture: displacementTexture || Texture.getBlankDisplacementMap(),
                 displacementFactor: displacementFactor || 100,
                 displacementBias: displacementBias || -60,
-                diffuseTexture: diffuseTexture,
-                specularTexture: specularTexture,
-                normalTexture: normalTexture,
+                diffuseTexture: diffuseTexture || blankTexture,
+                specularTexture: specularTexture || blankTexture,
+                normalTexture: normalTexture || Texture.getBlankNormalMap(),
             }
         })
         this.#color = this.uniforms['color'] as Color;

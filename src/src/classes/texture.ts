@@ -103,4 +103,22 @@ export class Texture {
 
 
     onLoad(callbackFn: Function) { this._callbackFn = callbackFn; }
+
+    static getBlankTexture(): Texture {
+        const blankTexture = new Texture();
+        blankTexture.setData('/blank/blank.png')
+        return blankTexture;
+    }
+
+    static getBlankNormalMap(): Texture {
+        const blankTexture = new Texture();
+        blankTexture.setData('/blank/blank-normal.png')
+        return blankTexture;
+    }
+
+    static getBlankDisplacementMap(): Texture {
+        const blankTexture = new Texture();
+        blankTexture.setData('/blank/blank-displacement.png')
+        return blankTexture;
+    }
 }
