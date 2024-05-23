@@ -26,8 +26,8 @@ export class DirectionalLight extends Light {
     get uniforms() {
         return {
             ...super.uniforms,
-            lightDirection: this.direction.toArray(),
-            lightIsDirectional: true, // menandakan directional light di shader
+            reverseLightDirection: this.direction.mul(-1).toArray(),
+            // lightIsDirectional: true, // menandakan directional light di shader
         }
     }
 }

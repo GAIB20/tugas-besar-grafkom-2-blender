@@ -1,7 +1,7 @@
 import {Node} from "./node.ts"
 import {UniformSet} from "../types/web-gl.ts";
 
-type LightOptions = {
+export type LightOptions = {
     color?: Color;
     uniforms?: UniformSet;
 };
@@ -20,4 +20,9 @@ export class Light extends Node {
 
     get color() { return this._color; }
     get uniforms() { return this._uniforms; }
+
+    set color(color: Color) {
+        this._color = color;
+        this._uniforms['lightColor'] = color;
+    }
 }

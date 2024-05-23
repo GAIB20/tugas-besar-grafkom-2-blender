@@ -16,6 +16,7 @@ import {hexToRgb, rgbToHex} from "./utils/color.ts";
 import {phongFrag, phongVert} from "./shaders/phong.ts";
 import {PhongMaterial} from "./classes/phong-material.ts";
 import {CubeGeometry} from "./geometries/cube-geometry.ts";
+import {DirectionalLight} from "./classes/directional-light.ts";
 
 let playAnimationTime: number | undefined = undefined;
 
@@ -273,6 +274,9 @@ function main() {
             else if (type === 'phongSpecular') {
                 selectedNode.phongMaterial.specularColor = hexToRgb(ui.value)
             }
+            else if (type === 'lightColor') {
+                directionalLight.color = hexToRgb(ui.value)
+            }
             drawScene();
         };
     }
@@ -336,6 +340,16 @@ function main() {
         drawScene()
     })
 
+    // Light
+    const directionalLight = new DirectionalLight('directional')
+    directionalLight.translation = new Vector3(0, 0, 1000);
+    directionalLight.target = selectedNode;
+    setupColorPicker('#lightColor', {
+        name: "Light Color",
+        value: rgbToHex(directionalLight.color),
+        picker: updateColor('phongAmbient')
+    })
+
     // Draw the scene.
     function drawScene() {
         setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
@@ -347,7 +361,7 @@ function main() {
 
         if (!selectedNode || !rootNode || !basicProgramInfo || !phongProgramInfo) return
         calculateTransformation(selectedNode)
-        drawMesh(rootNode, selectedCamera, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
+        drawMesh(rootNode, selectedCamera, directionalLight, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
 
         const primitiveType = gl.TRIANGLES;
         const offset = 0;
