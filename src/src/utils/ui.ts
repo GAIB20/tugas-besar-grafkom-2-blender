@@ -146,7 +146,7 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
     if (parent != null) {
         let button = document.createElement('button');
         button.textContent = options.name;
-        button.className = 'gman-widget-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded';
+        button.className = 'gman-widget-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2';
         button.addEventListener('click', options.onClick);
 
         parent.appendChild(button);
