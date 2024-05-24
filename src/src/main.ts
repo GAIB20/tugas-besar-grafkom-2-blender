@@ -90,19 +90,20 @@ function main() {
     rootNode = mesh;
     selectedNode = mesh
 
-    const animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json');
+    const animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json', drawScene);
     const animButton = createButton(document.getElementById('rightContainer'), {
-        name: "Play", onClick: () => {
+        name: "Play / Pause", onClick: () => {
             if (animator.isPlaying()) {
                 animator.stop();
-                if (animButton) animButton.textContent = "Play";
+                // if (animButton) animButton.textContent = "Play";
             } else {
                 animator.play();
                 requestAnimationFrame(playAnimation);
-                if (animButton) animButton.textContent = "Pause";
+                // if (animButton) animButton.textContent = "Pause";
             }
         }
     })
+    
 
     // Setup a ui.
     setupSlider("#x", {

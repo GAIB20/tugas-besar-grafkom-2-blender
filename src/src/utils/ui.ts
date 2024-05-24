@@ -146,7 +146,7 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
     if (parent != null) {
         let button = document.createElement('button');
         button.textContent = options.name;
-        button.className = 'gman-widget-button';
+        button.className = 'gman-widget-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded';
         button.addEventListener('click', options.onClick);
 
         parent.appendChild(button);
@@ -157,7 +157,7 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
 }
 
 export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelectedNode: (node: Node) => void) {
-    const styleIl: string = 'inline-block p-4 bg-purple-900 text-white rounded';
+    const styleIl: string = 'inline-block w-full p-4 bg-purple-900 text-white rounded';
     const styleButton: string = 'inline-block p-1 px-2 mx-2 bg-blue-600 text-white rounded hover:bg-blue-700';
     // const styleUl : string = 'fill-current';
 
