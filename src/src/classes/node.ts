@@ -1,5 +1,6 @@
 import {M4} from "../libs/m4.ts";
 import {Vector3} from "../libs/vector3.ts";
+import {INode} from "../interfaces/node.ts";
 
 export class Node {
     static nodes: Node[] = [];
@@ -160,5 +161,18 @@ export class Node {
     removeFromParent() {
         if (this.parent) this.parent.remove(this);
         return this;
+    }
+
+    toObject(): INode {
+        let result: INode = {
+            name: this.name,
+            translation: this.translation.toArray(),
+            rotation: this.rotation.toArray(),
+            scale: this.scale.toArray(),
+        }
+        if (this.children.length > 0) {
+            result['children'] = this.children.map((child) => child.idNode)
+        }
+        return result;
     }
 }

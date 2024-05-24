@@ -1,17 +1,10 @@
-export interface INodeMesh {
-    mesh: number,
+export interface INode {
     name: string,
     translation: number[],
     rotation: number[],
-    scale: number[]
+    scale: number[],
+    children?: number[],
+    camera?: number,
+    mesh?: number,
+    light?: number
 }
-
-export interface INodeCamera {
-    name: string,
-    camera: number,
-    translation: number[],
-    rotation: number[],
-    scale: number[]
-}
-
-export type INode = INodeMesh | INodeCamera;

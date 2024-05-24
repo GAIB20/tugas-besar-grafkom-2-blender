@@ -18,6 +18,7 @@ import {PhongMaterial} from "./classes/phong-material.ts";
 import {DirectionalLight} from "./classes/directional-light.ts";
 import {Texture} from "./classes/texture.ts";
 import BoxGeometry from "./geometries/box-geometry.ts";
+import {saveToJson} from "./utils/save-load.ts";
 
 let playAnimationTime: number | undefined = undefined;
 
@@ -48,7 +49,7 @@ function main() {
     let selectedCamera = orthoCamera;
 
     // const geometry = new CubeGeometry(100);
-    const geometry = new BoxGeometry(150, 150, 150, 30);
+    const geometry = new BoxGeometry(150, 150, 150, 1);
 
     const material = new BasicMaterial({color: [1, 0, 0, 1]})
 
@@ -91,7 +92,7 @@ function main() {
     selectedNode = mesh
 
     const animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json', drawScene);
-    const animButton = createButton(document.getElementById('rightContainer'), {
+    createButton(document.getElementById('animation'), {
         name: "Play / Pause", onClick: () => {
             if (animator.isPlaying()) {
                 animator.stop();
@@ -408,6 +409,10 @@ function main() {
         value: rgbToHex(directionalLight.color),
         picker: updateColor('phongAmbient')
     })
+
+    document.getElementById("downloadButton")?.addEventListener("click", () => {
+        saveToJson(rootNode);
+    });
 
     // Draw the scene.
     function drawScene() {

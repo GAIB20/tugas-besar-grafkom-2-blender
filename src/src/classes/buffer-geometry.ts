@@ -153,10 +153,13 @@ export class BufferGeometry {
     }
 
     toObject() {
-        return {
-            position: this.getAttribute('position').id,
-            normal: this.getAttribute('normal').id
-        }
+        const attributesObject: { [name: string]: number } = {};
+
+        Object.keys(this._attributes).forEach(name => {
+            attributesObject[name] = this._attributes[name].id
+        });
+
+        return attributesObject;
     }
 
     setDirty() {

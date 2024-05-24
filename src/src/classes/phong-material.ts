@@ -1,6 +1,7 @@
 import {phongFrag, phongVert} from "../shaders/phong";
 import {ShaderMaterial} from "./shader-material";
 import {Texture} from "./texture.ts";
+import {IMaterial} from "../interfaces/material.ts";
 
 type PhongMaterialOptions = {
     color: Color;
@@ -31,7 +32,7 @@ export class PhongMaterial extends ShaderMaterial {
 
     constructor(options?: PhongMaterialOptions) {
         const {color, shininess, ambientColor, specularColor, diffuseTexture, specularTexture, normalTexture, displacementTexture, displacementFactor, displacementBias} = options || {};
-        let blankTexture = Texture.getBlankDisplacementMap();
+        let blankTexture = Texture.getBlankTexture();
         super({
             vertexShader: phongVert,
             fragmentShader: phongFrag,
@@ -147,5 +148,21 @@ export class PhongMaterial extends ShaderMaterial {
     set displacementBias(bias: number) {
         this.#displacementBias = bias;
         this.uniforms['displacementBias'] = bias;
+    }
+
+    toObject(): IMaterial {
+        return {
+            type: 'phong',
+            color: this.color,
+            shininess: this.shininess,
+            ambientColor: this.ambientColor,
+            specularColor: this.specularColor,
+            diffuseTexture: this.diffuseTexture.id,
+            specularTexture: this.specularTexture.id,
+            normalTexture: this.normalTexture.id,
+            displacementTexture: this.displacementTexture.id,
+            displacementFactor: this.displacementFactor,
+            displacementBias: this.displacementBias,
+        }
     }
 }

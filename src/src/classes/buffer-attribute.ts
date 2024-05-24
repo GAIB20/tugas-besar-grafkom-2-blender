@@ -3,7 +3,8 @@ import {IAccessor, IBuffer, IBufferView} from "../interfaces/buffer.ts";
 type TypedArray = Float32Array | Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array;
 
 export class BufferAttribute {
-    static BufferIdx: number;
+    static Buffers: BufferAttribute[] = [];
+    static BufferIdx: number = 0;
     private _data: TypedArray;
     private _size: number;
     private _dtype: number;
@@ -41,6 +42,7 @@ export class BufferAttribute {
         this._offset    = options.offset    || 0;
         this.id = BufferAttribute.BufferIdx;
         BufferAttribute.BufferIdx++
+        BufferAttribute.Buffers.push(this)
     }
 
 

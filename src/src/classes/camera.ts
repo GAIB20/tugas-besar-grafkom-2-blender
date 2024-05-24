@@ -1,5 +1,6 @@
 import {Node} from "./node.ts"
 import {M4} from "../libs/m4.ts";
+import {ICamera} from "../interfaces/camera.ts";
 
 export class Camera extends Node {
     protected _projectionMatrix = M4.identity();
@@ -23,5 +24,9 @@ export class Camera extends Node {
 
     computeProjectionMatrix() {
         throw new Error("Camera.computeProjectionMatrix() must be implemented in derived classes.");
+    }
+
+    toObjectCamera(): ICamera {
+        throw new Error("Camera.toObjectCamera() must be implemented in derived classes.");
     }
 }

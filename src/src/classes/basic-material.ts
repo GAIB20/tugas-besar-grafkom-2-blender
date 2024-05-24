@@ -1,5 +1,6 @@
 import { basicVert, basicFrag } from "../shaders/basic";
 import { ShaderMaterial } from "./shader-material";
+import {IMaterial} from "../interfaces/material.ts";
 
 type BasicMaterialOptions = {
     color: Color;
@@ -25,5 +26,12 @@ export class BasicMaterial extends ShaderMaterial {
     set color(color: [number, number, number, number]) {
         this.#color = color;
         this.uniforms['color'] = color;
+    }
+
+    toObject(): IMaterial {
+        return {
+            type: 'basic',
+            color: this.color
+        }
     }
 }

@@ -1,4 +1,6 @@
 export interface IMesh {
-    attributes: { position: number, normal: number },
-    material: number
+    attributes: { [name: string]: number },
+    material: 'basic' | 'phong',
+    basicMaterial: number,
+    phongMaterial: number
 }

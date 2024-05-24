@@ -1,3 +1,5 @@
+import {ITexture} from "../interfaces/texture.ts";
+
 type TextureData = HTMLImageElement | Uint8Array;
 type TextureDataInput = string | TextureData;
 type ValueOf<T> = T[keyof T];
@@ -35,6 +37,9 @@ export const ImageType = Object.freeze({
 
 
 export class Texture {
+    static Textures: Texture[] = []
+    static idText: number = 0;
+    id: number;
     private _img = new Image();
     private _data?: TextureData;
     private _callbackFn?: Function;
@@ -67,6 +72,8 @@ export class Texture {
 
     constructor() {
         this._setLoader(this._img);
+        this.id = Texture.idText++;
+        Texture.Textures.push(this);
     }
 
 
@@ -120,5 +127,11 @@ export class Texture {
         const blankTexture = new Texture();
         blankTexture.setData('/blank/blank-displacement.png')
         return blankTexture;
+    }
+
+    toObject(): ITexture {
+        return {
+            src: this._img.src
+        }
     }
 }

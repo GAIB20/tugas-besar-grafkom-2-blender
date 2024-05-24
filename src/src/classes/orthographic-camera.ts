@@ -1,5 +1,6 @@
 import {M4} from "../libs/m4.ts";
 import {Camera} from "./camera.ts";
+import {ICamera} from "../interfaces/camera.ts";
 
 export class OrthographicCamera extends Camera {
   private _width: number;
@@ -39,5 +40,17 @@ export class OrthographicCamera extends Camera {
 
   computeProjectionMatrix() {
     this._projectionMatrix = M4.orthographic(this.width, this.height, -this.near, -this.far);
+  }
+
+  toObjectCamera(): ICamera {
+    return {
+      type: 'orthographic',
+      orthographic: {
+        near: this.near,
+        far: this.far,
+        width: this.width,
+        height: this.height
+      }
+    }
   }
 }

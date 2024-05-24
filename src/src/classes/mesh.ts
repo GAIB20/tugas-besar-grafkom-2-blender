@@ -27,7 +27,9 @@ export class Mesh extends Node {
     toObjectMesh(): IMesh {
         return {
             attributes: this.geometry.toObject(),
-            material: parseInt(this.basicMaterial.id.slice(1))
+            material: this.material instanceof BasicMaterial ? 'basic' : 'phong',
+            basicMaterial: parseInt(this.basicMaterial.id.slice(1)),
+            phongMaterial: parseInt(this.phongMaterial.id.slice(1))
         }
     }
 

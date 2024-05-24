@@ -1,4 +1,5 @@
 import {UniformSet} from "../types/web-gl.ts";
+import {IMaterial} from "../interfaces/material.ts";
 
 type ShaderMaterialOptions = {
     vertexShader: string;
@@ -7,6 +8,7 @@ type ShaderMaterialOptions = {
 };
 
 export class ShaderMaterial {
+    static Materials: ShaderMaterial[] = [];
     static #idCounter = 0;
 
     private readonly _id: string = "M" + (ShaderMaterial.#idCounter++);
@@ -22,6 +24,7 @@ export class ShaderMaterial {
         this._vertexShader = vertexShader;
         this._fragmentShader = fragmentShader;
         this._uniforms = uniforms || this._uniforms;
+        ShaderMaterial.Materials.push(this);
     }
 
     get id() { return this._id; }
@@ -31,5 +34,9 @@ export class ShaderMaterial {
 
     equals(material: ShaderMaterial) {
         return this._id == material._id;
+    }
+
+    toObject(): IMaterial {
+        throw new Error("ShaderMaterial.toObjectCamera() must be implemented in derived classes.");
     }
 }
