@@ -160,8 +160,9 @@ export class BufferGeometry {
     }
 
     setDirty() {
-        for (let attr in Object.values(this._attributes)) {
-            this._attributes[attr].isDirty = true;
-        }
+        Object.keys(this._attributes).forEach(name => {
+            const attribute = this._attributes[name];
+            attribute.isDirty = true;
+        });
     }
 }

@@ -17,12 +17,7 @@ export const drawMesh = (mesh: Node, camera: Camera | null, light: DirectionalLi
     if (!(mesh instanceof Mesh)) return
 
     mesh.geometry.calculateNormals()
-    // let meshProgramInfo = mesh.material instanceof BasicMaterial ? basicProgramInfo : phongProgramInfo;
-    let meshProgramInfo = phongProgramInfo;
-    if (mesh.material instanceof BasicMaterial) {
-        meshProgramInfo = basicProgramInfo;
-    }
-    if (!meshProgramInfo) return;
+    let meshProgramInfo = mesh.material instanceof BasicMaterial ? basicProgramInfo : phongProgramInfo;
 
     let bindBuffers = false;
     if (meshProgramInfo !== lastUsedProgramInfo) {
@@ -34,7 +29,7 @@ export const drawMesh = (mesh: Node, camera: Camera | null, light: DirectionalLi
 
     if (bindBuffers || lastUsedGeometry !== mesh.geometry) {
         lastUsedGeometry = mesh.geometry;
-        // mesh.geometry.setDirty();
+        mesh.geometry.setDirty();
         setAttributes(meshProgramInfo, mesh.geometry.attributes);
     }
 
