@@ -71,30 +71,30 @@ function main() {
     setupSlider("#x", {
         name: "Translate x",
         value: selectedNode.translation[0],
-        slide: updatePosition(0),
+        slide: updatePosition(0, selectedNode),
         min: -gl.canvas.width,
         max: gl.canvas.width
     });
     setupSlider("#y", {
         name: "Translate y",
         value: selectedNode.translation[1],
-        slide: updatePosition(1),
+        slide: updatePosition(1, selectedNode),
         min: -gl.canvas.height,
         max: gl.canvas.height
     });
     setupSlider("#z", {
         name: "Translate z",
         value: selectedNode.translation[2],
-        slide: updatePosition(2),
+        slide: updatePosition(2, selectedNode),
         min: -gl.canvas.height,
         max: gl.canvas.height
     });
-    setupSlider("#angleX", {name: "Rotate x", value: radToDeg(selectedNode.rotation[0]), slide: updateRotation(0), max: 360});
-    setupSlider("#angleY", {name: "Rotate y", value: radToDeg(selectedNode.rotation[1]), slide: updateRotation(1), max: 360});
-    setupSlider("#angleZ", {name: "Rotate z", value: radToDeg(selectedNode.rotation[2]), slide: updateRotation(2), max: 360});
+    setupSlider("#angleX", {name: "Rotate x", value: radToDeg(selectedNode.rotation[0]), slide: updateRotation(0, selectedNode), max: 360});
+    setupSlider("#angleY", {name: "Rotate y", value: radToDeg(selectedNode.rotation[1]), slide: updateRotation(1, selectedNode), max: 360});
+    setupSlider("#angleZ", {name: "Rotate z", value: radToDeg(selectedNode.rotation[2]), slide: updateRotation(2, selectedNode), max: 360});
     setupSlider("#scaleX", {
         value: selectedNode.scale[0],
-        slide: updateScale(0),
+        slide: updateScale(0, selectedNode),
         min: -5,
         max: 5,
         step: 0.01,
@@ -103,7 +103,7 @@ function main() {
     });
     setupSlider("#scaleY", {
         value: selectedNode.scale[1],
-        slide: updateScale(1),
+        slide: updateScale(1, selectedNode),
         min: -5,
         max: 5,
         step: 0.01,
@@ -112,7 +112,7 @@ function main() {
     });
     setupSlider("#scaleZ", {
         value: selectedNode.scale[2],
-        slide: updateScale(2),
+        slide: updateScale(2, selectedNode),
         min: -5,
         max: 5,
         step: 0.01,
@@ -128,7 +128,7 @@ function main() {
     setupSlider("#radiusCam", {
         name: "Radius",
         value: selectedCamera.translation[2],
-        slide: updateRadius(2),
+        slide: updatePosition(2, selectedCamera),
         min: 0,
         max: 2000
     });
@@ -192,35 +192,27 @@ function main() {
 
     const objectList = document.getElementById('objectList') as HTMLElement;
 
-    function updateRadius(index: number) {
-        if (!selectedCamera) return
-        return function (_event: any, ui: { value: number; }) {
-            selectedCamera!.translation[index] = ui.value;
-            drawScene();
-        };
-    }
-
-    function updatePosition(index: number) {
+    function updatePosition(index: number, node: Node) {
         if (!selectedNode) return
         return function (_event: any, ui: { value: number; }) {
-            selectedNode!.translation[index] = ui.value;
+            node.translation[index] = ui.value;
             drawScene();
         };
     }
 
-    function updateRotation(index: number) {
+    function updateRotation(index: number, node: Node) {
         if (!selectedNode) return
         return function (_event: any, ui: { value: any; }) {
             let angleInDegrees = ui.value;
-            selectedNode!.rotation[index] = angleInDegrees * Math.PI / 180;
+            node.rotation[index] = angleInDegrees * Math.PI / 180;
             drawScene();
         };
     }
 
-    function updateScale(index: number) {
+    function updateScale(index: number, node: Node) {
         if (!selectedNode) return
         return function (_event: any, ui: { value: number; }) {
-            selectedNode!.scale[index] = ui.value;
+            node.scale[index] = ui.value;
             drawScene();
         };
     }
@@ -393,11 +385,9 @@ function main() {
                         } = loadFromJson(jsonObject, drawScene)
                         rootNode = newRoot
                         selectedNode = rootNode
-                        console.log(rootNode)
                         createObjectHierarcy(rootNode, objectList, setSelectedNode);
                         animator = new AnimationController(rootNode, animation, drawScene)
                         drawScene()
-                        // You can now use jsonObject which conforms to IModel interface
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                     }

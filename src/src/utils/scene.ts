@@ -5,7 +5,7 @@ import {ProgramInfo} from "../types/web-gl.ts";
 import {BufferGeometry} from "../classes/buffer-geometry.ts";
 import {degToRad, setAttributes, setUniform, setUniforms} from "./web-gl.ts";
 import {M4} from "../libs/m4.ts";
-import {Camera} from "../classes/camera.ts";
+import {Camera} from "../classes/camera/camera.ts";
 import {PhongMaterial} from "../classes/phong-material.ts";
 import {DirectionalLight} from "../classes/directional-light.ts";
 import {ShaderMaterial} from "../classes/shader-material.ts";

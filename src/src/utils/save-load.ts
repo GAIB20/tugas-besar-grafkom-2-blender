@@ -4,7 +4,7 @@ import {IMesh} from "../interfaces/mesh.ts";
 import {IAccessor, IBuffer, IBufferView} from "../interfaces/buffer.ts";
 import {Mesh} from "../classes/mesh.ts";
 import {ICamera} from "../interfaces/camera.ts";
-import {Camera} from "../classes/camera.ts";
+import {Camera} from "../classes/camera/camera.ts";
 import {BufferAttribute} from "../classes/buffer-attribute.ts";
 import {IMaterial} from "../interfaces/material.ts";
 import {ITexture} from "../interfaces/texture.ts";

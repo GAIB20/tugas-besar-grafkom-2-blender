@@ -14,7 +14,7 @@ export class DirectionalLight extends Light {
     get direction() {
         // direction = target.pos -  this.pos (in world space)
         if (this.target) {
-            this._direction = this.target.translation.subtract(this.translation).normalize();
+            this._direction = Vector3.sub(this.target.translation, this.translation).normalize();
         } else {
             // Asumsi target = (0,0,0), direction = -this.pos
             this._direction = this.translation.mul(-1).normalize();

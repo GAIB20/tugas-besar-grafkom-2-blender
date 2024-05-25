@@ -1,6 +1,6 @@
 import {resizeCanvasToDisplaySize} from "./web-gl.ts";
-import {Camera} from "../classes/camera.ts";
-import {OrthographicCamera} from "../classes/orthographic-camera.ts";
+import {Camera} from "../classes/camera/camera.ts";
+import {OrthographicCamera} from "../classes/camera/orthographic-camera.ts";
 
 export const setupContext = () => {
     let _canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');

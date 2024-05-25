@@ -1,4 +1,4 @@
-import { M4 } from "../libs/m4.ts";
+import { M4 } from "../../libs/m4.ts";
 import {Camera} from "./camera.ts";
 
 export class PerspectiveCamera extends Camera {

@@ -1,6 +1,6 @@
-import {M4} from "../libs/m4.ts";
+import {M4} from "../../libs/m4.ts";
 import {Camera} from "./camera.ts";
-import {ICamera} from "../interfaces/camera.ts";
+import {ICamera} from "../../interfaces/camera.ts";
 
 export class OrthographicCamera extends Camera {
   private _width: number;
