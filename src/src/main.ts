@@ -62,7 +62,7 @@ function main() {
             }
         }
     })
-    
+
 
     // Setup a ui.
     setupSlider("#x", {
@@ -86,9 +86,24 @@ function main() {
         min: -gl.canvas.height,
         max: gl.canvas.height
     });
-    setupSlider("#angleX", {name: "Rotate x", value: radToDeg(selectedNode.rotation[0]), slide: updateRotation(0, selectedNode), max: 360});
-    setupSlider("#angleY", {name: "Rotate y", value: radToDeg(selectedNode.rotation[1]), slide: updateRotation(1, selectedNode), max: 360});
-    setupSlider("#angleZ", {name: "Rotate z", value: radToDeg(selectedNode.rotation[2]), slide: updateRotation(2, selectedNode), max: 360});
+    setupSlider("#angleX", {
+        name: "Rotate x",
+        value: radToDeg(selectedNode.rotation[0]),
+        slide: updateRotation(0, selectedNode),
+        max: 360
+    });
+    setupSlider("#angleY", {
+        name: "Rotate y",
+        value: radToDeg(selectedNode.rotation[1]),
+        slide: updateRotation(1, selectedNode),
+        max: 360
+    });
+    setupSlider("#angleZ", {
+        name: "Rotate z",
+        value: radToDeg(selectedNode.rotation[2]),
+        slide: updateRotation(2, selectedNode),
+        max: 360
+    });
     setupSlider("#scaleX", {
         value: selectedNode.scale[0],
         slide: updateScale(0, selectedNode),
@@ -133,14 +148,26 @@ function main() {
         drawScene()
     })
 
-
-    setupSlider("#radiusCam", {
-        name: "Radius",
-        value: selectedCamera.translation[2],
-        slide: updatePosition(2, selectedCamera),
-        min: 0,
-        max: 2000
+    document.getElementById("resetCamera")?.addEventListener("click", () => {
+        selectedCamera.translation[2] = 200
+        setupRadiusCam()
+        originNode.rotation[0] = 0
+        originNode.rotation[1] = 0
+        originNode.computeWorldMatrix()
+        selectedCamera.computeWorldMatrix();
+        drawScene()
     });
+
+    function setupRadiusCam() {
+        setupSlider("#radiusCam", {
+            name: "Radius",
+            value: selectedCamera.translation[2],
+            slide: updatePosition(2, selectedCamera),
+            min: 0,
+            max: 2000
+        });
+    }
+    setupRadiusCam()
 
     let isMouseDown = false;
     let startX = 0;
@@ -374,7 +401,7 @@ function main() {
 
     // Save and Load
     document.getElementById("downloadButton")?.addEventListener("click", () => {
-        if(!rootNode) return;
+        if (!rootNode) return;
         saveToJson(rootNode, animator?.data);
     });
 
@@ -384,7 +411,7 @@ function main() {
             cleanupObjects()
             const file = input.files[0];
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = function (event) {
                 if (event.target && typeof event.target.result === 'string') {
                     try {
                         const jsonObject: IModel = JSON.parse(event.target.result);
