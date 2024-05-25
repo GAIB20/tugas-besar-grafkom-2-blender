@@ -1,6 +1,8 @@
 import { Keyframe } from "./keyframe"
 import { Node } from "../node"
 import {IAnimation} from "../../interfaces/animation.ts";
+import { easeInSine, easeInBack, easeInCircular, easeInCubic, easeInExpotential, easeInQuad, easeInQuart } from "../../utils/easing.ts";
+import { Vector3 } from "../../libs/vector3.ts";
 
 interface Frame {
     Keyframes: Keyframe[];
@@ -17,6 +19,7 @@ export class AnimationController {
     private _reverse : boolean = false;
     private _loop : boolean = true;
     private _drawScene: () => void;
+    private _tweening: string = "None";
     
     fps: number = 24;
     speed: number = 0.6;
@@ -39,6 +42,8 @@ export class AnimationController {
 
         this.appendButton();
 
+        this.createTweenControl(document.getElementById("animation")!);
+
         this._objectRoot = root;
     }
 
@@ -59,10 +64,9 @@ export class AnimationController {
     }
 
     update(secElapsed: number) {
-
         if (this._playing) {
             this._deltaFrame += (secElapsed * this.fps * this.speed);
-            if(this._deltaFrame >= 1){
+            if(this._deltaFrame >= 1 && this._tweening == "None"){
                 if (this._reverse) {
                     this._currentFrame = (this._currentFrame - Math.floor(this._deltaFrame)) % this._frames.length;
                     if (this._currentFrame < 0) {
@@ -71,6 +75,9 @@ export class AnimationController {
                 } else {
                     this._currentFrame = (this._currentFrame + Math.floor(this._deltaFrame)) % this._frames.length;
                 }
+
+                console.log("frame:" + this._currentFrame);
+                console.log("delta:" + this._deltaFrame);
                 this._deltaFrame %= 1;
 
                 this.updateFrameDisplay();
@@ -79,18 +86,141 @@ export class AnimationController {
                 }
                 this.animateNode();
             }
+            else if (this._deltaFrame > 0 && this._tweening != "None") {
+                console.log("tweening, delta: " + this._deltaFrame);
+                this.animateNodeTween(this._deltaFrame);
+            }
         }
     }
-    // update(deltaSecond: number) {
-    //     if (this.isPlaying) {
-    //         this.deltaFrame += deltaSecond * this.fps;
-    //         if (this.deltaFrame >= 1) { // 1 frame
-    //             this.currentFrame = (this.currentFrame + Math.floor(this.deltaFrame)) % this.length;
-    //             this.deltaFrame %= 1;
-    //             this.updateSceneGraph();
-    //         }
-    //     }
-    // }
+
+
+    animateNodeTween(xProgress : number){
+        const frame = this._frames[this._currentFrame];
+
+        for (let i = 0; i < frame.Keyframes.length; i++){
+            const keyframe = frame.Keyframes[i];
+            const nextKeyframe = this.findNextKeyframe(keyframe.nodeId);
+
+            const node = this._objectRoot.findNodeById(keyframe.nodeId);
+            if (node) {
+                if(keyframe.translation && nextKeyframe?.translation){
+                    node.translation = this.tweenValue(keyframe.translation, nextKeyframe.translation, xProgress);
+                }
+                if(keyframe.rotation && nextKeyframe?.rotation){
+                    console.log(node.rotation);
+                    node.rotation = this.tweenValue(keyframe.rotation, nextKeyframe.rotation, xProgress);
+                    console.log(node.rotation);
+                }
+                if(keyframe.scale && nextKeyframe?.scale){
+                    node.scale = this.tweenValue(keyframe.scale, nextKeyframe.scale, xProgress);
+                }
+
+                // if(keyframe.translation){
+                //     node.translation = keyframe.translation;
+                    
+                // }
+                // if(keyframe.rotation){
+                //     node.rotation = keyframe.rotation;
+                // }
+                // if(keyframe.scale){
+                //     node.scale = keyframe.scale;
+                // }
+            } else {
+                console.error(`Node with id ${keyframe.nodeId} not found`);
+                
+            }
+        }
+    }
+
+    findNextKeyframe(nodeId : number): Keyframe | null{
+        if(this._reverse){
+            console.log("reverse");
+            let i = (this._currentFrame - 1) % this._frames.length;
+            while (i != this._currentFrame){
+                const frame = this._frames[i];
+                const keyframe = frame.Keyframes.find((keyframe) => keyframe.nodeId == nodeId);
+                if(keyframe){
+                    return keyframe;
+                }
+                i--;
+            }
+            return null;
+        }
+
+        let i = (this._currentFrame + 1) % this._frames.length;
+        
+        while (i != this._currentFrame){
+            const frame = this._frames[i];
+            const keyframe = frame.Keyframes.find((keyframe) => keyframe.nodeId == nodeId);
+            if(keyframe){
+                return keyframe;
+            }
+            i++;
+        }
+        
+        return null
+    }
+
+    tweenValue(start : Vector3, end : Vector3, xProgress : number): Vector3{
+        let x : number = 0;
+        let y : number = 0;
+        let z : number = 0;
+
+
+        if (this._tweening == "Back") {
+            x = easeInBack(start[0], end[0], xProgress);
+            y = easeInBack(start[1], end[1], xProgress);
+            z = easeInBack(start[2], end[2], xProgress);
+        } else if (this._tweening == "Circular") {
+            x = easeInCircular(start[0], end[0], xProgress);
+            y = easeInCircular(start[1], end[1], xProgress);
+            z = easeInCircular(start[2], end[2], xProgress);
+        } else if (this._tweening == "Cubic") { 
+            x = easeInCubic(start[0], end[0], xProgress);
+            y = easeInCubic(start[1], end[1], xProgress);
+            z = easeInCubic(start[2], end[2], xProgress);
+        } else if (this._tweening == "Expotential") {
+            x = easeInExpotential(start[0], end[0], xProgress);
+            y = easeInExpotential(start[1], end[1], xProgress);
+            z = easeInExpotential(start[2], end[2], xProgress);
+        } else if (this._tweening == "Quad") {
+            x = easeInQuad(start[0], end[0], xProgress);
+            y = easeInQuad(start[1], end[1], xProgress);
+            z = easeInQuad(start[2], end[2], xProgress);
+        } else if (this._tweening == "Quart") {
+            x = easeInQuart(start[0], end[0], xProgress);
+            y = easeInQuart(start[1], end[1], xProgress);
+            z = easeInQuart(start[2], end[2], xProgress);
+        } else {
+            x = easeInSine(start[0], end[0], xProgress);
+            y = easeInSine(start[1], end[1], xProgress);
+            z = easeInSine(start[2], end[2], xProgress);
+        }
+
+        return new Vector3(x, y, z);
+
+    }
+
+    createTweenControl(parent: HTMLElement) {
+        let dropdown = document.createElement("select");
+        dropdown.className = 'bg-purple-900 text-white w-32 p-1 border-none rounded mt-3';
+        let tweenings = ["None", "Back", "Circular", "Cubic", "Expotential", "Quad", "Quart", "Sine"];
+        tweenings.forEach(tweening => {
+            let option = document.createElement("option");
+            option.value = tweening;
+            option.text = tweening;
+            if (tweening === this._tweening) {
+                option.selected = true;
+            }
+            dropdown.appendChild(option);
+        });
+
+        dropdown.onchange = (event) => {
+            this._tweening = (event.target as HTMLSelectElement).value;
+        }
+
+        parent.appendChild(dropdown);
+    }
 
     animateNode(){
         const frame = this._frames[this._currentFrame];
@@ -208,6 +338,7 @@ export class AnimationController {
         parent.appendChild(frameControl);
     
     }
+
 
     appendButton(){
         const parent = document.getElementById("animation");
