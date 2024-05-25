@@ -37,9 +37,7 @@ export class PerspectiveCamera extends Camera {
     return this._far;
   }
 
-  computeProjectionMatrix(): M4 {
-    // Implementasi
-    
-    throw new Error("Method not implemented.");
+  computeProjectionMatrix() {
+    this._projectionMatrix = M4.perspective(this.fovY, this.aspect, -this.near, -this.far)
   }
 }

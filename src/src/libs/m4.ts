@@ -299,4 +299,31 @@ export class M4 {
 
         return result;
     }
+
+    static perspective(fieldOfViewInRadians: number, aspect: number, near: number, far: number) {
+        let f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
+        let rangeInv = 1.0 / (near - far);
+
+        let result = new M4()
+        result[0]  = f / aspect
+        result[5] = f
+        result[10] = (near + far) * rangeInv
+        result[11] = -1
+        result[14] = near * far * rangeInv * 2
+
+        return result;
+    }
+
+    static oblique(width: number, height: number, near: number, far: number, angleXInRadians: number, angleYInRadians: number) {
+        const STMatrix = M4.orthographic(width, height, near, far);
+
+        let shearMatrix = M4.identity()
+        const shearX = 1 / Math.tan(angleXInRadians);
+        const shearY = 1 / Math.tan(angleYInRadians);
+        shearMatrix[8] = shearX
+        shearMatrix[9] = shearY
+
+        return this.multiply(shearMatrix, STMatrix);
+    }
+
 }
