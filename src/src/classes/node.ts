@@ -175,4 +175,12 @@ export class Node {
         }
         return result;
     }
+
+    fromObject(model: INode) {
+        for (let i = 0; i < 3; i++) {
+            this.translation[i] = model.translation[i]
+            this.rotation[i] = model.rotation[i]
+            this.scale[i] = model.scale[i]
+        }
+    }
 }

@@ -7,7 +7,7 @@
     <title>Blender</title>
 </head>
 <body class="h-screen w-screen flex">
-<div class="flex flex-col h-full bg-purple-950 w-[20vw] p-4 gap-4 text-white overflow-y-scroll">
+<div class="flex flex-col h-full bg-purple-950 w-[18vw] p-4 gap-4 text-white overflow-y-scroll">
     <h1 class="text-2xl font-bold text-white">Blender</h1>
     <div class="flex flex-col gap-2">
         <h2 class="text-lg font-bold text-white">Transformation</h2>
@@ -97,12 +97,14 @@
 <div>
     <canvas id="webgl-canvas" class="w-full h-full cursor-grab"></canvas>
 </div>
-<div id=rightContainer class="flex flex-col h-full bg-purple-950 w-[20vw] p-4 gap-4 text-white overflow-y-scroll">
+<div id=rightContainer class="flex flex-col h-full bg-purple-950 w-[18vw] p-4 gap-4 text-white overflow-y-scroll">
     <ul id="objectList"></ul>
     <h2 class="text-lg font-bold text-white">Animation</h2>
     <div id="animation" class="flex flex-col justify-center items-center w-full"></div>
     <h2 class="text-lg font-bold text-white">Model</h2>
     <button id="downloadButton" class="bg-white text-purple-900 rounded font-bold py-2">Save</button>
+    <input type="file" id="modelInput" accept=".json">
+    <button id="loadModelButton" class="bg-white text-purple-900 rounded font-bold py-2">Load</button>
 </div>
 <script type="module" src="src/main.ts"></script>
 </body>

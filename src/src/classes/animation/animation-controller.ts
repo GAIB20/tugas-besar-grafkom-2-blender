@@ -1,12 +1,13 @@
 import { Keyframe } from "./keyframe"
 import { Node } from "../node"
+import {IAnimation} from "../../interfaces/animation.ts";
 
 interface Frame {
     Keyframes: Keyframe[];
 }
 
 export class AnimationController {
-
+    private _data: IAnimation;
     private _playing: boolean = false;
     private _frames: Frame[] = [];
     private _currentFrame: number = 0;
@@ -20,14 +21,12 @@ export class AnimationController {
     fps: number = 24;
     speed: number = 0.6;
 
-    constructor(root : Node, animFilePath : string, drawCallback: () => void) {
+    constructor(root : Node, data : any, drawCallback: () => void) {
         this._drawScene = drawCallback;
-    
-        fetch(animFilePath)
-            .then(response => response.json())
-            .then(json => this.loadFrames(json))
-            .catch(error => console.error('Error:', error));
-        
+
+        this.loadFrames(data)
+        this._data = data;
+
         this._frameDisplay = this.createFrameDisplay();
         this.createFrameControlButton(document.getElementById("animation")!);
         
@@ -41,6 +40,10 @@ export class AnimationController {
         this.appendButton();
 
         this._objectRoot = root;
+    }
+
+    get data() {
+        return this._data;
     }
 
     play() {

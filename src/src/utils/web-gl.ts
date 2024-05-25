@@ -8,16 +8,20 @@ import {
 import {BufferAttribute} from "../classes/buffer-attribute.ts";
 import {Texture} from "../classes/texture.ts";
 
-export function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
-    let multiplier = 1;
-    const width = canvas.clientWidth * multiplier | 0;
-    const height = canvas.clientHeight * multiplier | 0;
-    if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
-        return true;
+export function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
+    const dpr = window.devicePixelRatio;
+    const { width, height } = canvas.getBoundingClientRect();
+    const displayWidth = Math.round(width * dpr);
+    const displayHeight = Math.round(height * dpr);
+    const needResize =
+        gl.canvas.width != displayWidth || gl.canvas.height != displayHeight;
+
+    if (needResize) {
+        gl.canvas.width = displayWidth;
+        gl.canvas.height = displayHeight;
     }
-    return false;
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 }
 
 export function createShader(gl: WebGLRenderingContext, type: GLenum, source: string) {

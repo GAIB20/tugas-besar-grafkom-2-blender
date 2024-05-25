@@ -157,13 +157,11 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
 }
 
 export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelectedNode: (node: Node) => void) {
+    parent.innerHTML = ''
     const styleIl: string = 'inline-block w-full p-4 bg-purple-900 text-white rounded';
     const styleButton: string = 'inline-block p-1 px-2 mx-2 bg-blue-600 text-white rounded hover:bg-blue-700';
     // const styleUl : string = 'fill-current';
 
-    if (parent === null) {
-        throw new Error("Parent HTML Element is null");
-    }
     if (node.children.length === 0) {
         const il = document.createElement('il');
         il.innerHTML = node.name; // node.name

@@ -15,9 +15,8 @@ export const setupContext = () => {
 }
 
 export const setupCanvas = (canvas: HTMLCanvasElement, gl: WebGLRenderingContext) => {
-    resizeCanvasToDisplaySize(canvas);
+    resizeCanvasToDisplaySize(canvas, gl);
     // Tell WebGL how to convert from clip space to pixels
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0, 0, 0, 0);
 
     // Clear the canvas.
@@ -35,7 +34,7 @@ export const setupCamera = (type: 'orthographic' | 'oblique' | 'perspective', gl
     let camera = null;
     if (type === 'orthographic') {
         const near = 0;
-        const far = -1000;
+        const far = -5000;
         camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, near, far);
         camera.computeProjectionMatrix()
     } else {

@@ -9,9 +9,9 @@ type ShaderMaterialOptions = {
 
 export class ShaderMaterial {
     static Materials: ShaderMaterial[] = [];
-    static #idCounter = 0;
+    static idCounter = 0;
 
-    private readonly _id: string = "M" + (ShaderMaterial.#idCounter++);
+    private readonly _id: string = "M" + (ShaderMaterial.idCounter++);
     private readonly _vertexShader: string;
     private readonly _fragmentShader: string;
     private _uniforms: UniformSet = {};
