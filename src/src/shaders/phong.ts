@@ -1,51 +1,3 @@
-// export const phongVert = `
-// attribute vec4 a_position;
-// attribute vec3 normal;
-//
-// uniform mat4 u_worldMatrix;
-// uniform mat4 u_viewMatrix;
-// uniform mat4 u_viewProjectionMatrix;
-//
-// uniform vec4 u_ligthColor; // La
-// uniform vec4 u_color; // Ka
-// uniform vec4 u_diffuseColor; // Kd
-// uniform vec4 u_specularColor; // Ks
-// uniform float u_shininess; // e'
-//
-// varying vec4 v_color;
-//
-// void main() {
-//    gl_Position = u_viewProjectionMatrix * u_worldMatrix * a_position;
-//
-//    vec4 vertPos4 = u_viewMatrix * a_position;
-//    vec3 vertPos = vec3(vertPos4) / vertPos4.w;
-//
-//    vec3 N = normalize(normal);
-//    vec3 L = normalize(-vertPos);
-//
-//    float lambertian = max(dot(N, L), 0.0);
-//    float specular = 0.0;
-//    if (lambertian > 0.0) {
-//       vec3 R = reflect(-L, N);
-//       vec3 V = normalize(-vertPos);
-//       float specAngle = max(dot(R, V), 0.0);
-//       specular = pow(specAngle, shininess);
-//    }
-//    v_color = u_color * u_ligthColor + u_diffuseColor * lambertian + u_specularColor * specular;
-// }
-// `
-//
-// export const phongFrag = `
-// precision mediump float;
-//
-// varying vec4 v_color;
-//
-// void main() {
-//    gl_FragColor = v_color;
-// }
-// `
-
-
 export const phongVert = `
     attribute vec4 a_position;
 
@@ -64,9 +16,14 @@ export const phongVert = `
     uniform sampler2D u_displacementTexture;
     uniform float u_displacementFactor;
     uniform float u_displacementBias;
+    
+    uniform bool u_lightIsDirectional;
+    uniform vec3 u_lightWorldPosition;
+    uniform vec3 u_reverseLightDirection;
 
     varying vec3 v_normal;
     varying vec3 v_surfaceToView;
+    varying vec3 v_surfaceToLight;
     varying vec2 v_texcoord;
 
     varying mat3 v_tbn;
@@ -83,6 +40,11 @@ export const phongVert = `
       gl_Position = u_worldViewProjection * vec4(displacementPos, 1.0);
       
       vec3 surfaceWorldPosition = (u_world * a_position).xyz;
+      if (u_lightIsDirectional) {
+        v_surfaceToLight = u_reverseLightDirection;
+      } else {
+        v_surfaceToLight = u_lightWorldPosition - surfaceWorldPosition;
+      }
       
       v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
       
@@ -101,10 +63,9 @@ export const phongFrag = `
     varying vec3 v_normal;
     varying vec3 v_surfaceToView;
     varying vec2 v_texcoord;
+    varying vec3 v_surfaceToLight;
 
     varying mat3 v_tbn;
-
-    uniform vec3 u_reverseLightDirection;
 
     uniform vec4 u_ambientColor;
     uniform vec4 u_color;
@@ -112,6 +73,11 @@ export const phongFrag = `
     uniform float u_shininess;
     uniform vec3 u_lightColor;
     uniform vec3 u_specularColor;
+    
+    uniform bool u_lightIsDirectional;
+    uniform float u_attenuationA;
+    uniform float u_attenuationB;
+    uniform float u_attenuationC;
     
     uniform sampler2D u_diffuseTexture;
     uniform sampler2D u_specularTexture;
@@ -123,15 +89,20 @@ export const phongFrag = `
        normal = normal -0.5;
        normal = normalize(v_tbn * normal);
        
-       vec3 lightDirection = normalize(u_reverseLightDirection);
-
-       float light = max(dot(normal, u_reverseLightDirection), 0.0);
+       vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
+       float light = max(dot(normal, surfaceToLightDirection), 0.0);
        
        vec3 surfaceToViewDirection = normalize(v_surfaceToView);
-       vec3 halfVector = normalize(lightDirection + surfaceToViewDirection);
+       vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
        float specular = 0.0;
       if (light > 0.0) {
         specular = max(pow(dot(normal, halfVector), u_shininess), 0.0);
+      }
+      
+      float distanceToLight = sqrt(dot(v_surfaceToLight, v_surfaceToLight));
+      float attenuationFactor = (u_attenuationA + u_attenuationB * distanceToLight + u_attenuationC * distanceToLight * distanceToLight) / 100000.0;
+      if (attenuationFactor == 0.0 || u_lightIsDirectional) {
+        attenuationFactor = 1.0;
       }
       
       vec4 diffuseTex = texture2D(u_diffuseTexture, v_texcoord);
@@ -139,11 +110,11 @@ export const phongFrag = `
 
        // Lets multiply just the color portion (not the alpha)
        // by the light
-       gl_FragColor.rgb += (diffuseTex.rgb * u_color.rgb * light * u_lightColor);
+       gl_FragColor.rgb += (diffuseTex.rgb * u_color.rgb * light * u_lightColor/ attenuationFactor);
 
        // Just add in the specular
        vec4 specularTex = texture2D(u_specularTexture, v_texcoord);
        // float specularGs = (specularTex.r + specularTex.g + specularTex.b) / 3.0;
-      gl_FragColor.rgb += (specular * u_specularColor * specularTex.r);
+      gl_FragColor.rgb += (specular * u_specularColor * specularTex.r / attenuationFactor);
     }`
 

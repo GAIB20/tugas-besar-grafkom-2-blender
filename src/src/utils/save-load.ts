@@ -14,7 +14,7 @@ import {BasicMaterial} from "../classes/basic-material.ts";
 import {PhongMaterial} from "../classes/phong-material.ts";
 import {BufferGeometry} from "../classes/buffer-geometry.ts";
 import {IAnimation} from "../interfaces/animation.ts";
-import {Light} from "../classes/light.ts";
+import {Light} from "../classes/light/light.ts";
 
 
 interface IScene {

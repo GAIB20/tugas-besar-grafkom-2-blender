@@ -1,5 +1,5 @@
-import {Node} from "./node.ts"
-import {UniformSet} from "../types/web-gl.ts";
+import {Node} from "../node.ts"
+import {UniformSet} from "../../types/web-gl.ts";
 
 export type LightOptions = {
     color?: Color;

@@ -1,19 +1,30 @@
 import './style.css'
 import {createProgramInfo, createShader, radToDeg, resizeCanvasToDisplaySize} from "./utils/web-gl.ts";
 import {createObjectHierarcy, setupColorPicker, setupSlider} from "./utils/ui.ts";
-import {Vector3} from "./libs/vector3.ts";
-import {adjustCanvasSizetoCam, getTexturePath, setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
+import {
+    adjustCanvasSizetoCam,
+    getTexturePath,
+    setupCamera,
+    setupCanvas,
+    setupContext,
+    setupLight
+} from "./utils/setup.ts";
 import {BufferGeometry} from "./classes/buffer-geometry.ts";
 import {basicFrag, basicVert} from "./shaders/basic.ts";
 import {Mesh} from "./classes/mesh.ts";
 import {ProgramInfo} from "./types/web-gl.ts";
-import {calculateTransformation, cleanupObjects, drawMesh, removeCamera, setupScene} from "./utils/scene.ts";
+import {
+    calculateTransformation,
+    cleanupObjects,
+    drawMesh,
+    removeNode,
+    setupScene
+} from "./utils/scene.ts";
 import {Node} from "./classes/node.ts";
 import {AnimationController} from "./classes/animation/animation-controller.ts";
 import {createButton} from "./utils/ui.ts";
 import {hexToRgb, rgbToHex} from "./utils/color.ts";
 import {phongFrag, phongVert} from "./shaders/phong.ts";
-import {DirectionalLight} from "./classes/directional-light.ts";
 import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
 
 // GLOBAL VARIABLE
@@ -132,6 +143,7 @@ function main() {
         name: "Scale z",
     });
 
+    // Camera
     const projectionSelect = document.getElementById('projection') as HTMLSelectElement
     let selectedCamera = setupCamera(projectionSelect.value, gl)
 
@@ -141,11 +153,12 @@ function main() {
 
     projectionSelect.addEventListener('change', () => {
         originNode.remove(selectedCamera)
-        removeCamera(selectedCamera)
+        removeNode(selectedCamera)
         selectedCamera = setupCamera(projectionSelect.value, gl)
         originNode.add(selectedCamera)
         selectedCamera.translation[2] = 200;
         drawScene()
+        setupRadiusCam()
     })
 
     document.getElementById("resetCamera")?.addEventListener("click", () => {
@@ -270,7 +283,7 @@ function main() {
             } else if (type === 'phongSpecular') {
                 selectedNode.phongMaterial.specularColor = hexToRgb(ui.value)
             } else if (type === 'lightColor') {
-                directionalLight.color = hexToRgb(ui.value)
+                selectedLight.color = hexToRgb(ui.value)
             }
             drawScene();
         };
@@ -390,13 +403,17 @@ function main() {
     })
 
     // Light
-    const directionalLight = new DirectionalLight('directional')
-    directionalLight.translation = new Vector3(0, 0, 1000);
-    directionalLight.target = selectedNode;
+    const lightSelect = document.getElementById('light') as HTMLSelectElement
+    let selectedLight = setupLight(lightSelect.value)
     setupColorPicker('#lightColor', {
         name: "Light Color",
-        value: rgbToHex(directionalLight.color),
+        value: rgbToHex(selectedLight.color),
         picker: updateColor('phongAmbient')
+    })
+    lightSelect.addEventListener('change', () => {
+        removeNode(selectedLight)
+        selectedLight = setupLight(lightSelect.value)
+        drawScene()
     })
 
     // Save and Load
@@ -446,7 +463,7 @@ function main() {
 
         if (!selectedNode || !rootNode || !basicProgramInfo || !phongProgramInfo) return
         calculateTransformation(selectedNode)
-        drawMesh(rootNode, selectedCamera, directionalLight, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
+        drawMesh(rootNode, selectedCamera, selectedLight, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
 
         const primitiveType = gl.TRIANGLES;
         const offset = 0;

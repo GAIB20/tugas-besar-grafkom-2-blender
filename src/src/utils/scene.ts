@@ -7,12 +7,12 @@ import {degToRad, setAttributes, setUniform, setUniforms} from "./web-gl.ts";
 import {M4} from "../libs/m4.ts";
 import {Camera} from "../classes/camera/camera.ts";
 import {PhongMaterial} from "../classes/phong-material.ts";
-import {DirectionalLight} from "../classes/directional-light.ts";
 import {ShaderMaterial} from "../classes/shader-material.ts";
 import {BufferAttribute} from "../classes/buffer-attribute.ts";
 import {Texture} from "../classes/texture.ts";
 import {Vector3} from "../libs/vector3.ts";
 import BoxGeometry from "../geometries/box-geometry.ts";
+import {Light} from "../classes/light/light.ts";
 
 export const cleanupObjects = (): void => {
     Node.nodes = []
@@ -25,14 +25,14 @@ export const cleanupObjects = (): void => {
     BufferAttribute.BufferIdx = 0
 }
 
-export const removeCamera = (camera: Camera) => {
+export const removeNode = (node: Node) => {
     let found = false;
     for (let i = 0; i < Node.nodes.length; i++) {
         if (found) {
             Node.nodes[i].idNode--;
             Node.nodes[i-1] = Node.nodes[i]
         }
-        if (Node.nodes[i] === camera) {
+        if (Node.nodes[i] === node) {
             found = true;
         }
     }
@@ -82,7 +82,7 @@ export const setupScene = (onloadCallback: () => void): Node => {
     return mesh
 }
 
-export const drawMesh = (mesh: Node, camera: Camera | null, light: DirectionalLight, gl: WebGLRenderingContext, basicProgramInfo: ProgramInfo, phongProgramInfo: ProgramInfo, lastUsedProgramInfo: ProgramInfo | null, lastUsedGeometry: BufferGeometry | null) => {
+export const drawMesh = (mesh: Node, camera: Camera | null, light: Light, gl: WebGLRenderingContext, basicProgramInfo: ProgramInfo, phongProgramInfo: ProgramInfo, lastUsedProgramInfo: ProgramInfo | null, lastUsedGeometry: BufferGeometry | null) => {
     if (!(mesh instanceof Mesh)) return
 
     mesh.geometry.calculateNormals()

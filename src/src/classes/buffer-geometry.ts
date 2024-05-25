@@ -117,6 +117,8 @@ export class BufferGeometry {
             const e2   = Vector3.sub(v3, v1);
             const dUV1 = Vector3.sub(uv2, uv1);
             const dUV2 = Vector3.sub(uv3, uv1);
+            // const dUV1 = Vector3.sub(uv1, uv2);
+            // const dUV2 = Vector3.sub(uv1, uv3);
 
             const f = 1.0 / (dUV1[0] * dUV2[1] - dUV2[0] * dUV1[1])
 

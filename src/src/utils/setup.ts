@@ -3,6 +3,9 @@ import {Camera} from "../classes/camera/camera.ts";
 import {OrthographicCamera} from "../classes/camera/orthographic-camera.ts";
 import {ObliqueCamera} from "../classes/camera/oblique-camera.ts";
 import {PerspectiveCamera} from "../classes/camera/perspective-camera.ts";
+import {DirectionalLight} from "../classes/light/directional-light.ts";
+import {Vector3} from "../libs/vector3.ts";
+import {PointLight} from "../classes/light/point-light.ts";
 
 export const setupContext = () => {
     let _canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
@@ -34,7 +37,7 @@ export const setupCanvas = (canvas: HTMLCanvasElement, gl: WebGLRenderingContext
 
 export const setupCamera = (type: string, gl: WebGLRenderingContext): Camera => {
     let camera = null;
-    const near = 0;
+    const near = -1;
     const far = -5000;
     if (type === 'orthographic') {
         camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, near, far);
@@ -42,10 +45,22 @@ export const setupCamera = (type: string, gl: WebGLRenderingContext): Camera => 
         camera = new ObliqueCamera(type, gl.canvas.width, gl.canvas.height, near, far, degToRad(50), degToRad(50));
     }
     else {
-        camera = new PerspectiveCamera(type, degToRad(60), 1, near, far)
+        camera = new PerspectiveCamera(type, degToRad(60), gl.canvas.width / gl.canvas.height, near, far)
     }
     camera.computeProjectionMatrix()
     return camera
+}
+
+export const setupLight = (type: string) => {
+    let light;
+    if (type === 'directional') {
+        light = new DirectionalLight(type)
+        light.translation = new Vector3(0, 0, 1000);
+    } else {
+        light = new PointLight(type)
+        light.translation = new Vector3(0, 0, 500);
+    }
+    return light;
 }
 
 export const getTexturePath = (type: 'diffuse' | 'specular' | 'normal' | 'displacement', value: string) => {
