@@ -66,3 +66,11 @@ export const getTexturePath = (type: 'diffuse' | 'specular' | 'normal' | 'displa
     // @ts-ignore
     return texturePaths[value][type]
 }
+
+export const adjustCanvasSizetoCam = (camera: Camera, gl: WebGLRenderingContext) => {
+    if (camera instanceof ObliqueCamera || camera instanceof OrthographicCamera) {
+        camera.width = gl.canvas.width
+        camera.height = gl.canvas.height
+        camera.computeProjectionMatrix()
+    }
+}

@@ -2,7 +2,7 @@ import './style.css'
 import {createProgramInfo, createShader, radToDeg, resizeCanvasToDisplaySize} from "./utils/web-gl.ts";
 import {createObjectHierarcy, setupColorPicker, setupSlider} from "./utils/ui.ts";
 import {Vector3} from "./libs/vector3.ts";
-import {getTexturePath, setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
+import {adjustCanvasSizetoCam, getTexturePath, setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
 import {BufferGeometry} from "./classes/buffer-geometry.ts";
 import {basicFrag, basicVert} from "./shaders/basic.ts";
 import {Mesh} from "./classes/mesh.ts";
@@ -438,7 +438,7 @@ function main() {
     // Draw the scene.
     function drawScene() {
         setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
-
+        adjustCanvasSizetoCam(selectedCamera, gl)
         selectedCamera.computeWorldMatrix()
 
         let lastUsedProgramInfo: ProgramInfo | null = null;

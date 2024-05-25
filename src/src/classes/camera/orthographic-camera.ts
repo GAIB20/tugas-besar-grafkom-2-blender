@@ -38,6 +38,14 @@ export class OrthographicCamera extends Camera {
     return this._far;
   }
 
+  set width(width: number) {
+    this._width = width;
+  }
+
+  set height(height: number) {
+    this._height = height;
+  }
+
   computeProjectionMatrix() {
     this._projectionMatrix = M4.orthographic(this.width, this.height, -this.near, -this.far);
   }

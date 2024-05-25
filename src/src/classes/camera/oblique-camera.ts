@@ -52,6 +52,14 @@ export class ObliqueCamera extends Camera {
         return this._angleY
     }
 
+    set width(width: number) {
+        this._width = width;
+    }
+
+    set height(height: number) {
+        this._height = height;
+    }
+
     computeProjectionMatrix() {
         this._projectionMatrix = M4.oblique(this.width, this.height, -this.near, -this.far, this.angleX, this.angleY);
     }
