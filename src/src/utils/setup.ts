@@ -55,7 +55,7 @@ export const setupLight = (type: string) => {
     let light;
     if (type === 'directional') {
         light = new DirectionalLight(type)
-        light.translation = new Vector3(0, 0, 1000);
+        light.translation = new Vector3(0, 0, 100);
     } else {
         light = new PointLight(type)
         light.translation = new Vector3(0, 0, 500);

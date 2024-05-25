@@ -200,3 +200,18 @@ export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelecte
     }
 
 }
+
+export function clearPointLightProp() {
+    document.getElementById('lightPosX')!.innerHTML = ''
+    document.getElementById('lightPosY')!.innerHTML = ''
+    document.getElementById('lightPosZ')!.innerHTML = ''
+    document.getElementById('lightAttA')!.innerHTML = ''
+    document.getElementById('lightAttB')!.innerHTML = ''
+    document.getElementById('lightAttC')!.innerHTML = ''
+}
+
+export function clearDirectionalLightProp() {
+    document.getElementById('lightDirX')!.innerHTML = ''
+    document.getElementById('lightDirY')!.innerHTML = ''
+    document.getElementById('lightDirZ')!.innerHTML = ''
+}

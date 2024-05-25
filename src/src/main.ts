@@ -1,6 +1,12 @@
 import './style.css'
 import {createProgramInfo, createShader, radToDeg, resizeCanvasToDisplaySize} from "./utils/web-gl.ts";
-import {createObjectHierarcy, setupColorPicker, setupSlider} from "./utils/ui.ts";
+import {
+    clearDirectionalLightProp,
+    clearPointLightProp,
+    createObjectHierarcy,
+    setupColorPicker,
+    setupSlider
+} from "./utils/ui.ts";
 import {
     adjustCanvasSizetoCam,
     getTexturePath,
@@ -26,6 +32,8 @@ import {createButton} from "./utils/ui.ts";
 import {hexToRgb, rgbToHex} from "./utils/color.ts";
 import {phongFrag, phongVert} from "./shaders/phong.ts";
 import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
+import {DirectionalLight} from "./classes/light/directional-light.ts";
+import {PointLight} from "./classes/light/point-light.ts";
 
 // GLOBAL VARIABLE
 let playAnimationTime: number | undefined = undefined;
@@ -180,6 +188,7 @@ function main() {
             max: 3000
         });
     }
+
     setupRadiusCam()
 
     let isMouseDown = false;
@@ -366,6 +375,7 @@ function main() {
     });
     document.addEventListener('DOMContentLoaded', () => {
         setupMaterialProp()
+        setupLightProp()
         drawScene()
         if (!rootNode) return
         createObjectHierarcy(rootNode, objectList, setSelectedNode);
@@ -405,14 +415,116 @@ function main() {
     // Light
     const lightSelect = document.getElementById('light') as HTMLSelectElement
     let selectedLight = setupLight(lightSelect.value)
-    setupColorPicker('#lightColor', {
-        name: "Light Color",
-        value: rgbToHex(selectedLight.color),
-        picker: updateColor('phongAmbient')
-    })
+
+    function updateAttenuation(variable: 'A' | 'B' | 'C') {
+        if (!(selectedLight instanceof PointLight)) return
+        return function (_event: any, ui: { value: number; }) {
+            if (!(selectedLight instanceof PointLight)) return
+            if (variable === 'A') {
+                selectedLight.attenuationA = ui.value
+            } else if (variable === 'B') {
+                selectedLight.attenuationB = ui.value
+            } else {
+                selectedLight.attenuationC = ui.value
+            }
+            drawScene()
+        };
+    }
+
+    function setupLightProp() {
+        if (!selectedLight) return
+        setupLightColor()
+        if (selectedLight instanceof DirectionalLight) {
+            clearPointLightProp()
+            setupSlider("#lightDirX", {
+                value: selectedLight.translation[0],
+                slide: updatePosition(0, selectedLight),
+                min: -100,
+                max: 100,
+                step: 1,
+                name: "Rotation X",
+            });
+            setupSlider("#lightDirY", {
+                value: selectedLight.translation[1],
+                slide: updatePosition(1, selectedLight),
+                min: -100,
+                max: 100,
+                step: 1,
+                name: "Rotation Y",
+            });
+            setupSlider("#lightDirZ", {
+                value: selectedLight.translation[2],
+                slide: updatePosition(2, selectedLight),
+                min: -100,
+                max: 100,
+                step: 1,
+                name: "Rotation Z",
+            });
+        } else {
+            clearDirectionalLightProp()
+            setupSlider("#lightPosX", {
+                value: selectedLight.translation[0],
+                slide: updatePosition(0, selectedLight),
+                min: -100,
+                max: 100,
+                step: 1,
+                name: "Position X",
+            });
+            setupSlider("#lightPosY", {
+                value: selectedLight.translation[1],
+                slide: updatePosition(1, selectedLight),
+                min: -100,
+                max: 100,
+                step: 1,
+                name: "Position Y",
+            });
+            setupSlider("#lightPosZ", {
+                value: selectedLight.translation[2],
+                slide: updatePosition(2, selectedLight),
+                min: -300,
+                max: 3000,
+                step: 1,
+                name: "Position Z",
+            });
+            setupSlider("#lightAttA", {
+                value: selectedLight.attenuationA,
+                slide: updateAttenuation('A'),
+                min: 1,
+                max: 100,
+                step: 1,
+                name: "Attenuation A",
+            });
+            setupSlider("#lightAttB", {
+                value: selectedLight.attenuationB,
+                slide: updateAttenuation('B'),
+                min: 1,
+                max: 100,
+                step: 1,
+                name: "Attenuation B",
+            });
+            setupSlider("#lightAttC", {
+                value: selectedLight.attenuationC,
+                slide: updateAttenuation('C'),
+                min: 1,
+                max: 100,
+                step: 1,
+                name: "Attenuation C",
+            });
+        }
+    }
+
+    function setupLightColor() {
+        setupColorPicker('#lightColor', {
+            name: "Light Color",
+            value: rgbToHex(selectedLight.color),
+            picker: updateColor('lightColor')
+        })
+    }
+
     lightSelect.addEventListener('change', () => {
         removeNode(selectedLight)
         selectedLight = setupLight(lightSelect.value)
+        setupLightProp()
         drawScene()
     })
 
