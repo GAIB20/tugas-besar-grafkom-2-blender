@@ -42,7 +42,7 @@ export const setupCamera = (type: string, gl: WebGLRenderingContext): Camera => 
     if (type === 'orthographic') {
         camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, near, far);
     } else if (type === 'oblique'){
-        camera = new ObliqueCamera(type, gl.canvas.width, gl.canvas.height, near, far, degToRad(50), degToRad(50));
+        camera = new ObliqueCamera(type, gl.canvas.width, gl.canvas.height, near, far, degToRad(55), degToRad(55));
     }
     else {
         camera = new PerspectiveCamera(type, degToRad(60), gl.canvas.width / gl.canvas.height, near, far)

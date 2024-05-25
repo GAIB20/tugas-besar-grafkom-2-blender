@@ -149,20 +149,20 @@ function main() {
 
     const originNode = new Node("origin");
     originNode.add(selectedCamera)
-    selectedCamera.translation[2] = 200;
+    selectedCamera.translation[2] = 850;
 
     projectionSelect.addEventListener('change', () => {
         originNode.remove(selectedCamera)
         removeNode(selectedCamera)
         selectedCamera = setupCamera(projectionSelect.value, gl)
         originNode.add(selectedCamera)
-        selectedCamera.translation[2] = 200;
+        selectedCamera.translation[2] = 850;
         drawScene()
         setupRadiusCam()
     })
 
     document.getElementById("resetCamera")?.addEventListener("click", () => {
-        selectedCamera.translation[2] = 200
+        selectedCamera.translation[2] = 850
         setupRadiusCam()
         originNode.rotation[0] = 0
         originNode.rotation[1] = 0
@@ -177,7 +177,7 @@ function main() {
             value: selectedCamera.translation[2],
             slide: updatePosition(2, selectedCamera),
             min: 0,
-            max: 2000
+            max: 3000
         });
     }
     setupRadiusCam()
