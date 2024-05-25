@@ -25,6 +25,19 @@ export const cleanupObjects = (): void => {
     BufferAttribute.BufferIdx = 0
 }
 
+export const removeCamera = (camera: Camera) => {
+    let found = false;
+    for (let i = 0; i < Node.nodes.length; i++) {
+        if (found) {
+            Node.nodes[i].idNode--;
+            Node.nodes[i-1] = Node.nodes[i]
+        }
+        if (Node.nodes[i] === camera) {
+            found = true;
+        }
+    }
+}
+
 export const setupScene = (onloadCallback: () => void): Node => {
     // const geometry = new CubeGeometry(100);
     const geometry = new BoxGeometry(150, 150, 150, 1);

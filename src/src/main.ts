@@ -2,12 +2,12 @@ import './style.css'
 import {createProgramInfo, createShader, radToDeg, resizeCanvasToDisplaySize} from "./utils/web-gl.ts";
 import {createObjectHierarcy, setupColorPicker, setupSlider} from "./utils/ui.ts";
 import {Vector3} from "./libs/vector3.ts";
-import {setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
+import {getTexturePath, setupCamera, setupCanvas, setupContext} from "./utils/setup.ts";
 import {BufferGeometry} from "./classes/buffer-geometry.ts";
 import {basicFrag, basicVert} from "./shaders/basic.ts";
 import {Mesh} from "./classes/mesh.ts";
 import {ProgramInfo} from "./types/web-gl.ts";
-import {calculateTransformation, cleanupObjects, drawMesh, setupScene} from "./utils/scene.ts";
+import {calculateTransformation, cleanupObjects, drawMesh, removeCamera, setupScene} from "./utils/scene.ts";
 import {Node} from "./classes/node.ts";
 import {AnimationController} from "./classes/animation/animation-controller.ts";
 import {createButton} from "./utils/ui.ts";
@@ -41,9 +41,6 @@ function main() {
 
     const canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement
     resizeCanvasToDisplaySize(canvas, gl);
-
-    const orthoCamera = setupCamera('orthographic', gl)
-    let selectedCamera = orthoCamera;
 
     rootNode = setupScene(drawScene);
     selectedNode = rootNode
@@ -120,10 +117,22 @@ function main() {
         name: "Scale z",
     });
 
+    const projectionSelect = document.getElementById('projection') as HTMLSelectElement
+    let selectedCamera = setupCamera(projectionSelect.value, gl)
 
     const originNode = new Node("origin");
-    originNode.add(orthoCamera)
-    orthoCamera.translation[2] = 200;
+    originNode.add(selectedCamera)
+    selectedCamera.translation[2] = 200;
+
+    projectionSelect.addEventListener('change', () => {
+        originNode.remove(selectedCamera)
+        removeCamera(selectedCamera)
+        selectedCamera = setupCamera(projectionSelect.value, gl)
+        originNode.add(selectedCamera)
+        selectedCamera.translation[2] = 200;
+        drawScene()
+    })
+
 
     setupSlider("#radiusCam", {
         name: "Radius",
@@ -157,7 +166,7 @@ function main() {
         originNode.rotation[0] += (-deltaY / 100);
         originNode.rotation[1] += (-deltaX / 100);
         originNode.computeWorldMatrix();
-        orthoCamera.computeWorldMatrix();
+        selectedCamera.computeWorldMatrix();
         drawScene()
     }
 
@@ -329,25 +338,25 @@ function main() {
     const dispTextureSelect = document.getElementById('displacementTexture') as HTMLSelectElement;
 
     diffTextureSelect.addEventListener('change', () => {
-        let path = diffTextureSelect.value === 'blank' ? '/blank/blank.png' : `/${diffTextureSelect.value}/diffuse.png`
+        let path = getTexturePath('diffuse', diffTextureSelect.value)
         if (!(selectedNode instanceof Mesh)) return
         selectedNode.phongMaterial.diffuseTexture.setData(path);
         drawScene()
     })
     specTextureSelect.addEventListener('change', () => {
-        let path = specTextureSelect.value === 'blank' ? '/blank/blank.png' : `/${specTextureSelect.value}/specular.png`
+        let path = getTexturePath('specular', specTextureSelect.value)
         if (!(selectedNode instanceof Mesh)) return
         selectedNode.phongMaterial.specularTexture.setData(path);
         drawScene()
     })
     normalTextureSelect.addEventListener('change', () => {
-        let path = normalTextureSelect.value === 'blank' ? '/blank/blank-normal.png' : `/${normalTextureSelect.value}/normal-map.png`
+        let path = getTexturePath('normal', normalTextureSelect.value)
         if (!(selectedNode instanceof Mesh)) return
         selectedNode.phongMaterial.normalTexture.setData(path);
         drawScene()
     })
     dispTextureSelect.addEventListener('change', () => {
-        let path = dispTextureSelect.value === 'blank' ? '/blank/blank-displacement.png' : `/${dispTextureSelect.value}/displacement-map.png`
+        let path = getTexturePath('displacement', dispTextureSelect.value)
         if (!(selectedNode instanceof Mesh)) return
         selectedNode.phongMaterial.displacementTexture.setData(path);
         drawScene()

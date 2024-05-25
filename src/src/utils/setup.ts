@@ -1,6 +1,8 @@
-import {resizeCanvasToDisplaySize} from "./web-gl.ts";
+import {degToRad, resizeCanvasToDisplaySize} from "./web-gl.ts";
 import {Camera} from "../classes/camera/camera.ts";
 import {OrthographicCamera} from "../classes/camera/orthographic-camera.ts";
+import {ObliqueCamera} from "../classes/camera/oblique-camera.ts";
+import {PerspectiveCamera} from "../classes/camera/perspective-camera.ts";
 
 export const setupContext = () => {
     let _canvas: HTMLCanvasElement | null = document.querySelector<HTMLCanvasElement>('#webgl-canvas');
@@ -30,16 +32,37 @@ export const setupCanvas = (canvas: HTMLCanvasElement, gl: WebGLRenderingContext
     gl.enable(gl.DEPTH_TEST);
 }
 
-export const setupCamera = (type: 'orthographic' | 'oblique' | 'perspective', gl: WebGLRenderingContext): Camera => {
+export const setupCamera = (type: string, gl: WebGLRenderingContext): Camera => {
     let camera = null;
+    const near = 0;
+    const far = -5000;
     if (type === 'orthographic') {
-        const near = 0;
-        const far = -5000;
         camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, near, far);
-        camera.computeProjectionMatrix()
-    } else {
-        camera = new OrthographicCamera(type, gl.canvas.width, gl.canvas.height, -1, -500);
-        camera.computeProjectionMatrix()
+    } else if (type === 'oblique'){
+        camera = new ObliqueCamera(type, gl.canvas.width, gl.canvas.height, near, far, degToRad(50), degToRad(50));
     }
+    else {
+        camera = new PerspectiveCamera(type, degToRad(60), 1, near, far)
+    }
+    camera.computeProjectionMatrix()
     return camera
+}
+
+export const getTexturePath = (type: 'diffuse' | 'specular' | 'normal' | 'displacement', value: string) => {
+    const texturePaths = {
+        blank: {
+            diffuse: '/blank/blank.png',
+            specular: '/blank/blank.png',
+            normal: '/blank/blank-normal.png',
+            displacement: '/blank/blank-displacement.png'
+        },
+        spiral: {
+            diffuse: '/spiral/diffuse.png',
+            specular: '/spiral/specular.png',
+            normal: '/spiral/normal-map.png',
+            displacement: '/spiral/displacement-map.png'
+        }
+    }
+    // @ts-ignore
+    return texturePaths[value][type]
 }
