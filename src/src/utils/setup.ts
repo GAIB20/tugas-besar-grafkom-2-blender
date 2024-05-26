@@ -76,7 +76,19 @@ export const getTexturePath = (type: 'diffuse' | 'specular' | 'normal' | 'displa
             specular: '/spiral/specular.png',
             normal: '/spiral/normal-map.png',
             displacement: '/spiral/displacement-map.png'
-        }
+        },
+        crate: {
+            diffuse: '/crate/diffuse.jpg',
+            specular: '/crate/specular.jpg',
+            normal: '/crate/normal.jpg',
+            displacement: '/crate/displacement.png'
+        },
+        metal: {
+            diffuse: '/metal/diffuse.jpg',
+            specular: '/metal/specular.jpg',
+            normal: '/metal/normal.jpg',
+            displacement: '/metal/displacement.png'
+        },
     }
     // @ts-ignore
     return texturePaths[value][type]
