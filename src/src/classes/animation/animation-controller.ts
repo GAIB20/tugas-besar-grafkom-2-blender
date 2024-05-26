@@ -22,7 +22,7 @@ export class AnimationController {
     private _tweening: string = "None";
     
     fps: number = 24;
-    speed: number = 0.6;
+    speed: number = 0.2;
 
     constructor(root : Node, data : any, drawCallback: () => void) {
         this._drawScene = drawCallback;
