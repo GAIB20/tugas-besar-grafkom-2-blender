@@ -1,4 +1,4 @@
-# 2D-Web-Based-CAD
+# WebGL Part 2: 3D Engine
 
 > Disusun untuk memenuhi Tugas 2 IF3260 Grafika Komputer WebGL Part 2: 3D Engine
 
