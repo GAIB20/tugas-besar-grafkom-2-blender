@@ -12,6 +12,30 @@ export class Vector3 {
         return 3;
     }
 
+    get x(): number {
+        return this[0];
+    }
+
+    set x(x: number) {
+        this[0] = x;
+    }
+
+    get y(): number {
+        return this[1];
+    }
+
+    set y(y: number) {
+        this[1] = y;
+    }
+
+    get z(): number {
+        return this[2];
+    }
+
+    set z(z: number) {
+        this[2] = z;
+    }
+
     set(v: number[]) {
         this[0] = v[0];
         this[1] = v[1];
@@ -56,9 +80,9 @@ export class Vector3 {
     }
 
     mul(s: number) {
-        this[0] *=s;
-        this[1] *=s;
-        this[2] *=s;
+        this[0] *= s;
+        this[1] *= s;
+        this[2] *= s;
         return this
     }
 
