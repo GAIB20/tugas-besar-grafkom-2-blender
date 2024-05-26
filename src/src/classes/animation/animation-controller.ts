@@ -22,7 +22,7 @@ export class AnimationController {
     private _tweening: string = "None";
     
     fps: number = 24;
-    speed: number = 0.6;
+    speed: number = 0.2;
 
     constructor(root : Node, data : any, drawCallback: () => void) {
         this._drawScene = drawCallback;
@@ -63,10 +63,19 @@ export class AnimationController {
         this._playing = false;
     }
 
+    currentFrame() {
+        return this._currentFrame;
+    }
+
+    setDeltaFrame(delta: number) {
+        this._deltaFrame = delta;
+    }
+
     update(secElapsed: number) {
         if (this._playing) {
             this._deltaFrame += (secElapsed * this.fps * this.speed);
-            if(this._deltaFrame >= 1 && this._tweening == "None"){
+            if(this._deltaFrame >= 1){
+                console.log("frame before:" + this._currentFrame);
                 if (this._reverse) {
                     this._currentFrame = (this._currentFrame - Math.floor(this._deltaFrame)) % this._frames.length;
                     if (this._currentFrame < 0) {
@@ -202,6 +211,13 @@ export class AnimationController {
     }
 
     createTweenControl(parent: HTMLElement) {
+        let div = document.createElement("div");
+        div.className = "flex flex-wrap justify-center items-center gap-2";
+
+        let label = document.createElement("p");
+        label.innerHTML = "Tweening: ";
+
+
         let dropdown = document.createElement("select");
         dropdown.className = 'bg-purple-900 text-white w-32 p-1 border-none rounded mt-3';
         let tweenings = ["None", "Back", "Circular", "Cubic", "Expotential", "Quad", "Quart", "Sine"];
@@ -219,7 +235,9 @@ export class AnimationController {
             this._tweening = (event.target as HTMLSelectElement).value;
         }
 
-        parent.appendChild(dropdown);
+        div.appendChild(label);
+        div.appendChild(dropdown);
+        parent.appendChild(div);
     }
 
     animateNode(){

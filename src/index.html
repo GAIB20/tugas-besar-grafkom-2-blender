@@ -9,7 +9,7 @@
 <body class="h-screen w-screen flex">
 <div class="flex flex-col h-full bg-purple-950 w-[18vw] p-4 gap-4 text-white overflow-y-scroll">
     <h1 class="text-2xl font-bold text-white">Blender</h1>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 selected-node-prop">
         <h2 class="text-lg font-bold text-white">Transformation</h2>
         <div id="x"></div>
         <div id="y"></div>
@@ -21,7 +21,7 @@
         <div id="scaleY"></div>
         <div id="scaleZ"></div>
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 selected-node-prop">
         <h2 class="text-lg font-bold text-white">Camera</h2>
         <div>
             <label for="projection" class="font-medium">Select Projection Type</label>
@@ -35,7 +35,7 @@
         <div id="radiusCam"></div>
         <button id="resetCamera" class="bg-white text-purple-900 rounded font-bold py-2">Reset to Default View</button>
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 selected-node-prop">
         <h2 class="text-lg font-bold text-white">Light</h2>
         <div>
             <label for="light" class="font-medium">Select Light Type</label>
@@ -60,7 +60,7 @@
             <div id="lightColor"></div>
         </div>
     </div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 selected-node-prop">
         <h2 class="text-lg font-bold text-white">Material</h2>
         <div>
             <label for="material" class="font-medium">Select Material Type</label>
@@ -74,8 +74,10 @@
                 <h3 class="font-bold mt-2 phong-properties">Diffuse</h3>
                 <div id="diffuseColor">
                 </div>
-                <label for="diffuseTexture" id="diffuseTextureLabel" class="font-medium phong-properties">Diffuse Texture</label>
-                <select id="diffuseTexture" class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
+                <label for="diffuseTexture" id="diffuseTextureLabel" class="font-medium phong-properties">Diffuse
+                    Texture</label>
+                <select id="diffuseTexture"
+                        class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
                     <option value="spiral">Spiral</option>
                     <option value="metal">Metal</option>
                     <option value="crate">Crate</option>
@@ -87,8 +89,10 @@
                 <h3 class="font-bold mt-2 phong-properties">Specular</h3>
                 <div id="specularColor">
                 </div>
-                <label for="specularTexture" id="specularTextureLabel" class="font-medium phong-properties">Specular Texture</label>
-                <select id="specularTexture" class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
+                <label for="specularTexture" id="specularTextureLabel" class="font-medium phong-properties">Specular
+                    Texture</label>
+                <select id="specularTexture"
+                        class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
                     <option value="spiral">Spiral</option>
                     <option value="metal">Metal</option>
                     <option value="crate">Crate</option>
@@ -96,16 +100,20 @@
                 </select>
                 <div id="shininess"></div>
                 <h3 class="font-bold mt-2 phong-properties">Normal Map</h3>
-                <label for="normalTexture" id="normalTextureLabel" class="font-medium phong-properties">Normal Map Texture</label>
-                <select id="normalTexture" class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
+                <label for="normalTexture" id="normalTextureLabel" class="font-medium phong-properties">Normal Map
+                    Texture</label>
+                <select id="normalTexture"
+                        class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
                     <option value="spiral">Spiral</option>
                     <option value="metal">Metal</option>
                     <option value="crate">Crate</option>
                     <option value="blank">No Texture</option>
                 </select>
                 <h3 class="font-bold mt-2 phong-properties">Displacement Map</h3>
-                <label for="displacementTexture" id="displacementTextureLabel" class="font-medium phong-properties">Displacement Map Texture</label>
-                <select id="displacementTexture" class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
+                <label for="displacementTexture" id="displacementTextureLabel" class="font-medium phong-properties">Displacement
+                    Map Texture</label>
+                <select id="displacementTexture"
+                        class="mt-1 w-full py-2 border border-gray-300 bg-white rounded-md shadow-sm text-gray-900 phong-properties">
                     <option value="spiral">Spiral</option>
                     <option value="metal">Metal</option>
                     <option value="crate">Crate</option>
@@ -120,14 +128,25 @@
 <div>
     <canvas id="webgl-canvas" class="w-full h-full cursor-grab"></canvas>
 </div>
-<div id=rightContainer class="flex flex-col h-full bg-purple-950 w-[18vw] p-4 gap-4 text-white overflow-y-scroll">
-    <ul id="objectList" class="overflow-y-auto" style="max-height: 50vh;"></ul>
-    <h2 class="text-lg font-bold text-white">Animation</h2>
-    <div id="animation" class="flex flex-col justify-center items-center w-full"></div>
+<div id=rightContainer class="flex flex-col h-full bg-purple-950 w-[20vw] p-4 gap-4 text-white overflow-y-scroll">
+    <ul id="objectList" class="overflow-y-auto max-h-[60vh]"></ul>
+    <div class="selected-node-prop grid-cols-2">
+        <button id="addDefault" class="bg-white text-purple-900 rounded font-bold py-2">Add Default</button>
+        <button id="deleteComponent" class="bg-white text-purple-900 rounded font-bold py-2">Delete</button>
+        <input type="file" id="subtreeInput" accept=".json" class="col-span-2">
+        <button id="exportSubtree" class="bg-white text-purple-900 rounded font-bold py-2 col-span-1">Export Subtree</button>
+        <button id="importSubtree" class="bg-white text-purple-900 rounded font-bold py-2 col-span-1">Import Subtree</button>
+    </div>
+    <div class="selected-node-prop">
+        <h2 class="text-lg font-bold text-white">Animation</h2>
+        <div id="animation" class="flex flex-col justify-center items-center w-full"></div>
+    </div>
     <h2 class="text-lg font-bold text-white">Model</h2>
-    <button id="downloadButton" class="bg-white text-purple-900 rounded font-bold py-2">Save</button>
-    <input type="file" id="modelInput" accept=".json" class="h-fit">
-    <button id="loadModelButton" class="bg-white text-purple-900 rounded font-bold py-2">Load</button>
+    <div class="flex flex-col gap-2">
+        <button id="downloadButton" class="bg-white text-purple-900 rounded font-bold py-2">Save</button>
+        <input type="file" id="modelInput" accept=".json" class="h-fit">
+        <button id="loadModelButton" class="bg-white text-purple-900 rounded font-bold py-2">Load</button>
+    </div>
 </div>
 <script type="module" src="src/main.ts"></script>
 </body>

@@ -1,5 +1,6 @@
 import {BufferAttribute} from "./buffer-attribute.ts";
 import {Vector3} from "../libs/vector3.ts";
+import {IBufferSubtree} from "../interfaces/subtree.ts";
 
 export class BufferGeometry {
     private _attributes: { [name: string]: BufferAttribute };
@@ -159,6 +160,16 @@ export class BufferGeometry {
 
         Object.keys(this._attributes).forEach(name => {
             attributesObject[name] = this._attributes[name].id
+        });
+
+        return attributesObject;
+    }
+
+    toObjectSubtree() {
+        const attributesObject: { [name: string]: IBufferSubtree } = {};
+
+        Object.keys(this._attributes).forEach(name => {
+            attributesObject[name] = this._attributes[name].toObjectSubtree()
         });
 
         return attributesObject;

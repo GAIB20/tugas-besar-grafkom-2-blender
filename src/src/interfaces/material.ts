@@ -1,9 +1,9 @@
-interface IBasicMaterial {
+export interface IBasicMaterial {
     type: 'basic'
     color: [number, number, number, number]
 }
 
-interface IPhongMaterial {
+export interface IPhongMaterial {
     type: 'phong'
     color: [number, number, number, number]
     shininess: number;

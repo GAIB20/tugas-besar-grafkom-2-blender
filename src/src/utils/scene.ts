@@ -13,10 +13,13 @@ import {Texture} from "../classes/texture.ts";
 import {Vector3} from "../libs/vector3.ts";
 import BoxGeometry from "../geometries/box-geometry.ts";
 import {Light} from "../classes/light/light.ts";
+import {BoxPlainGeometry} from "../geometries/box-plain-geometry.ts";
 
 export const cleanupObjects = (): void => {
     Node.nodes = []
     Node.nodeIdx = 0
+    Mesh.Meshes = []
+    Mesh.MeshId = 1
     ShaderMaterial.Materials = []
     ShaderMaterial.idCounter = 0
     Texture.Textures = []
@@ -29,6 +32,7 @@ export const removeNode = (node: Node) => {
     let found = false;
     for (let i = 0; i < Node.nodes.length; i++) {
         if (found) {
+            node.idNode = -1
             Node.nodes[i].idNode--;
             Node.nodes[i-1] = Node.nodes[i]
         }
@@ -87,7 +91,7 @@ export const setupScene = (onloadCallback: () => void, meshCallback: (node: Node
 }
 
 export const drawMesh = (mesh: Node, camera: Camera | null, light: Light, gl: WebGLRenderingContext, basicProgramInfo: ProgramInfo, phongProgramInfo: ProgramInfo, lastUsedProgramInfo: ProgramInfo | null, lastUsedGeometry: BufferGeometry | null, pickProgramInfo?: ProgramInfo) => {
-    if (!(mesh instanceof Mesh)) return
+    if (!(mesh instanceof Mesh) || mesh.idNode === -1) return
 
     mesh.geometry.calculateNormals()
     let meshProgramInfo;
@@ -177,4 +181,34 @@ export function handleClick(
         Mesh.Meshes[id - 1].click()
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
+
+
+export function addDefault(rootNode: Node, onloadCallback: () => void, meshCallback: (node: Node) => void) {
+    const geometry = new BoxPlainGeometry(100, 100, 100);
+
+    const material = new BasicMaterial({color: [1, 0, 0, 1]})
+
+    const diffuseTexture = new Texture();
+    diffuseTexture.setData('/blank/diffuse.png')
+    diffuseTexture.onLoad(() => onloadCallback())
+    const specularTexture = new Texture();
+    specularTexture.setData('/blank/specular.png');
+    specularTexture.onLoad(() => onloadCallback())
+    const normalTexture = new Texture();
+    normalTexture.setData('/blank/normal-map.png')
+    normalTexture.onLoad(() => onloadCallback())
+    const displacementTexture = new Texture();
+    displacementTexture.setData('/blank/displacement-map.png')
+    displacementTexture.onLoad(() => onloadCallback())
+    const material2 = new PhongMaterial({
+        color: [1, 0, 0, 1],
+        diffuseTexture: diffuseTexture,
+        specularTexture: specularTexture,
+        normalTexture: normalTexture,
+        displacementTexture: displacementTexture
+    })
+
+    let defaultMesh = new Mesh(`default${Mesh.MeshId}`, geometry, material, material2, meshCallback)
+    rootNode.add(defaultMesh)
 }
