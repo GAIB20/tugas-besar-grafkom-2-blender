@@ -22,10 +22,10 @@ import {
     setupContext,
     setupLight
 } from "./utils/setup.ts";
-import {BufferGeometry} from "./classes/buffer-geometry.ts";
-import {basicFrag, basicVert} from "./shaders/basic.ts";
-import {Mesh} from "./classes/mesh.ts";
-import {ProgramInfo} from "./types/web-gl.ts";
+import { BufferGeometry } from "./classes/buffer-geometry.ts";
+import { basicFrag, basicVert } from "./shaders/basic.ts";
+import { Mesh } from "./classes/mesh.ts";
+import { ProgramInfo } from "./types/web-gl.ts";
 import {
     calculateTransformation,
     cleanupObjects,
@@ -33,15 +33,15 @@ import {
     removeNode,
     setupScene
 } from "./utils/scene.ts";
-import {Node} from "./classes/node.ts";
-import {AnimationController} from "./classes/animation/animation-controller.ts";
-import {createButton} from "./utils/ui.ts";
-import {hexToRgb, rgbToHex} from "./utils/color.ts";
-import {phongFrag, phongVert} from "./shaders/phong.ts";
-import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
-import {DirectionalLight} from "./classes/light/directional-light.ts";
-import {PointLight} from "./classes/light/point-light.ts";
-import {pickFrag, pickVert} from "./shaders/pick.ts";
+import { Node } from "./classes/node.ts";
+import { AnimationController } from "./classes/animation/animation-controller.ts";
+import { createButton } from "./utils/ui.ts";
+import { hexToRgb, rgbToHex } from "./utils/color.ts";
+import { phongFrag, phongVert } from "./shaders/phong.ts";
+import { IModel, loadFromJson, saveToJson } from "./utils/save-load.ts";
+import { DirectionalLight } from "./classes/light/directional-light.ts";
+import { PointLight } from "./classes/light/point-light.ts";
+import { pickFrag, pickVert } from "./shaders/pick.ts";
 
 // GLOBAL VARIABLE
 let playAnimationTime: number | undefined = undefined;
@@ -193,7 +193,7 @@ function main() {
     });
 
     function updateRadius() {
-        return function (_event: any, ui: { value: number; }) {
+        return function(_event: any, ui: { value: number; }) {
             if (!selectedNode) return
             selectedCamera.translation[2] = ui.value;
             drawScene();
@@ -265,15 +265,10 @@ function main() {
         }
     }
 
-    function setSelectedNode(node: Node) {
-        selectedNode = node;
-        console.log(selectedNode)
-    }
-
     const objectList = document.getElementById('objectList') as HTMLElement;
 
     function updatePosition(index: number) {
-        return function (_event: any, ui: { value: number; }) {
+        return function(_event: any, ui: { value: number; }) {
             if (!selectedNode) return
             selectedNode.translation[index] = ui.value;
             drawScene();
@@ -281,7 +276,7 @@ function main() {
     }
 
     function updateRotation(index: number) {
-        return function (_event: any, ui: { value: any; }) {
+        return function(_event: any, ui: { value: any; }) {
             if (!selectedNode) return
             let angleInDegrees = ui.value;
             selectedNode.rotation[index] = angleInDegrees * Math.PI / 180;
@@ -290,7 +285,7 @@ function main() {
     }
 
     function updateScale(index: number) {
-        return function (_event: any, ui: { value: number; }) {
+        return function(_event: any, ui: { value: number; }) {
             if (!selectedNode) return
             selectedNode.scale[index] = ui.value;
             drawScene();
@@ -303,7 +298,7 @@ function main() {
 
     function updateColor(type: string) {
         if (!selectedNode) return
-        return function (_event: any, ui: { value: string; }) {
+        return function(_event: any, ui: { value: string; }) {
             if (!(selectedNode instanceof Mesh)) return
             if (type === 'basic') {
                 selectedNode.basicMaterial.color = hexToRgb(ui.value)
@@ -322,7 +317,7 @@ function main() {
 
     function updateMaterialProp(type: 'shininess' | 'dispFactor' | 'dispBias') {
         if (!selectedNode) return
-        return function (_event: any, ui: { value: number; }) {
+        return function(_event: any, ui: { value: number; }) {
             if (!(selectedNode instanceof Mesh)) return
             if (type === 'shininess') {
                 selectedNode.phongMaterial.shininess = ui.value
@@ -401,8 +396,16 @@ function main() {
         setupLightProp()
         drawScene()
         if (!rootNode) return
-        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+        createObjectHierarcy(rootNode, selectedNode, objectList, setSelectedNode);
     })
+
+    function setSelectedNode(node: Node) {
+        selectedNode = node;
+        if (rootNode) {
+            createObjectHierarcy(rootNode, selectedNode, objectList, setSelectedNode);
+        }
+        console.log(selectedNode)
+    }
 
     // Texture
     const diffTextureSelect = document.getElementById('diffuseTexture') as HTMLSelectElement;
@@ -441,7 +444,7 @@ function main() {
 
     function updateAttenuation(variable: 'A' | 'B' | 'C') {
         if (!(selectedLight instanceof PointLight)) return
-        return function (_event: any, ui: { value: number; }) {
+        return function(_event: any, ui: { value: number; }) {
             if (!(selectedLight instanceof PointLight)) return
             if (variable === 'A') {
                 selectedLight.attenuationA = ui.value
@@ -455,7 +458,7 @@ function main() {
     }
 
     function updateLightPosition(index: number) {
-        return function (_event: any, ui: { value: number; }) {
+        return function(_event: any, ui: { value: number; }) {
             if (!selectedLight) return
             selectedLight.translation[index] = ui.value;
             drawScene();
@@ -571,7 +574,7 @@ function main() {
             cleanupObjects()
             const file = input.files[0];
             const reader = new FileReader();
-            reader.onload = function (event) {
+            reader.onload = function(event) {
                 if (event.target && typeof event.target.result === 'string') {
                     try {
                         const jsonObject: IModel = JSON.parse(event.target.result);
@@ -581,7 +584,7 @@ function main() {
                         } = loadFromJson(jsonObject, drawScene)
                         rootNode = newRoot
                         selectedNode = rootNode
-                        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+                        createObjectHierarcy(rootNode, selectedNode, objectList, setSelectedNode);
                         animator = new AnimationController(rootNode, animation, drawScene)
                         drawScene()
                     } catch (error) {

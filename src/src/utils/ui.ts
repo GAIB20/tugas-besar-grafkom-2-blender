@@ -1,4 +1,4 @@
-import {Node} from '../classes/node.ts';
+import { Node } from '../classes/node.ts';
 
 export function setupSlider(selector: string, options: {
     name: any;
@@ -68,7 +68,7 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
     function handleChange(event: { target: { value: string; }; }) {
         let value = parseInt(event.target.value);
         updateValue(value);
-        fn(event, {value: value * step});
+        fn(event, { value: value * step });
     }
 
     sliderElem.addEventListener('input', handleChange);
@@ -127,7 +127,7 @@ export function createColorPicker(parent: { innerHTML: string; querySelector: (a
     function handleChange(event: { target: { value: string; }; }) {
         updateValue(event.target.value);
         console.log(event.target.value);
-        fn(event, {value: event.target.value});
+        fn(event, { value: event.target.value });
     }
 
     pickerElem.addEventListener('input', handleChange);
@@ -156,18 +156,18 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
 
 }
 
-export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelectedNode: (node: Node) => void) {
+export function createObjectHierarcy(node: Node, selectedNode: Node | null, parent: HTMLElement, setSelectedNode: (node: Node) => void) {
     parent.innerHTML = ''
     const styleIl: string = 'inline-block w-full p-4 bg-purple-900 text-white rounded';
     const styleButton: string = 'inline-block p-1 px-2 mx-2 bg-blue-600 text-white rounded hover:bg-blue-700';
     // const styleUl : string = 'fill-current';
 
-    if (node.children.length === 0) {
-        const il = document.createElement('il');
-        il.innerHTML = node.name; // node.name
-        il.className = styleIl;
-        parent.appendChild(il);
+    const il = document.createElement('il');
+    il.innerHTML = node.name; // node.name
+    il.className = styleIl;
+    parent.appendChild(il);
 
+    if (!selectedNode?.isEqual(node)) {
         const button = document.createElement('button');
         button.textContent = 'select';
         button.className = styleButton;
@@ -175,27 +175,16 @@ export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelecte
             setSelectedNode(node)
         })
         il.appendChild(button);
-    } else {
-        const il = document.createElement('il');
-        il.innerHTML = node.name; // node.name
-        il.className = styleIl;
-        parent.appendChild(il);
+    }
 
-        const button = document.createElement('button');
-        button.textContent = 'select';
-        button.className = styleButton;
-        button.addEventListener('click', () => {
-            setSelectedNode(node)
-        })
-        il.appendChild(button);
-
+    if (node.children.length > 0) {
         const ul = document.createElement('ul');
         // ul.className = styleUl;
         ul.id = parent + "child";
         il.appendChild(ul);
 
         node.children.forEach(element => {
-            createObjectHierarcy(element, ul, setSelectedNode);
+            createObjectHierarcy(element, selectedNode, ul, setSelectedNode);
         });
     }
 
