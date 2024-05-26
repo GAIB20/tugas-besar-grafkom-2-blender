@@ -1,5 +1,11 @@
 import './style.css'
-import {createProgramInfo, createShader, radToDeg, resizeCanvasToDisplaySize} from "./utils/web-gl.ts";
+import {
+    createProgramInfo,
+    createShader,
+    radToDeg,
+    resizeCanvasToDisplaySize,
+    setFramebufferAttachmentSizes
+} from "./utils/web-gl.ts";
 import {
     clearBasicMaterialProp,
     clearDirectionalLightProp, clearPhongMaterialProp,
@@ -23,7 +29,7 @@ import {ProgramInfo} from "./types/web-gl.ts";
 import {
     calculateTransformation,
     cleanupObjects,
-    drawMesh,
+    drawMesh, handleClick,
     removeNode,
     setupScene
 } from "./utils/scene.ts";
@@ -35,6 +41,7 @@ import {phongFrag, phongVert} from "./shaders/phong.ts";
 import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
 import {DirectionalLight} from "./classes/light/directional-light.ts";
 import {PointLight} from "./classes/light/point-light.ts";
+import {pickFrag, pickVert} from "./shaders/pick.ts";
 
 // GLOBAL VARIABLE
 let playAnimationTime: number | undefined = undefined;
@@ -57,12 +64,17 @@ function main() {
     if (!phongFragmentShader || !phongVertexShader) return;
     let phongProgramInfo = createProgramInfo(gl, phongVertexShader, phongFragmentShader)
 
+    let pickVertexShader = createShader(gl, gl.VERTEX_SHADER, pickVert);
+    let pickFragmentShader = createShader(gl, gl.FRAGMENT_SHADER, pickFrag);
+    if (!pickFragmentShader || !pickVertexShader) return;
+    let pickProgramInfo = createProgramInfo(gl, pickVertexShader, pickFragmentShader)
+
     cleanupObjects();
 
     const canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement
     resizeCanvasToDisplaySize(canvas, gl);
 
-    rootNode = setupScene(drawScene);
+    rootNode = setupScene(drawScene, setSelectedNode);
     selectedNode = rootNode
 
     // animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json', drawScene);
@@ -88,45 +100,45 @@ function main() {
     setupSlider("#x", {
         name: "Translate x",
         value: selectedNode.translation[0],
-        slide: updatePosition(0, selectedNode),
+        slide: updatePosition(0),
         min: -gl.canvas.width,
         max: gl.canvas.width
     });
     setupSlider("#y", {
         name: "Translate y",
         value: selectedNode.translation[1],
-        slide: updatePosition(1, selectedNode),
+        slide: updatePosition(1),
         min: -gl.canvas.height,
         max: gl.canvas.height
     });
     setupSlider("#z", {
         name: "Translate z",
         value: selectedNode.translation[2],
-        slide: updatePosition(2, selectedNode),
+        slide: updatePosition(2),
         min: -gl.canvas.height,
         max: gl.canvas.height
     });
     setupSlider("#angleX", {
         name: "Rotate x",
         value: radToDeg(selectedNode.rotation[0]),
-        slide: updateRotation(0, selectedNode),
+        slide: updateRotation(0),
         max: 360
     });
     setupSlider("#angleY", {
         name: "Rotate y",
         value: radToDeg(selectedNode.rotation[1]),
-        slide: updateRotation(1, selectedNode),
+        slide: updateRotation(1),
         max: 360
     });
     setupSlider("#angleZ", {
         name: "Rotate z",
         value: radToDeg(selectedNode.rotation[2]),
-        slide: updateRotation(2, selectedNode),
+        slide: updateRotation(2),
         max: 360
     });
     setupSlider("#scaleX", {
         value: selectedNode.scale[0],
-        slide: updateScale(0, selectedNode),
+        slide: updateScale(0),
         min: -5,
         max: 5,
         step: 0.01,
@@ -135,7 +147,7 @@ function main() {
     });
     setupSlider("#scaleY", {
         value: selectedNode.scale[1],
-        slide: updateScale(1, selectedNode),
+        slide: updateScale(1),
         min: -5,
         max: 5,
         step: 0.01,
@@ -144,7 +156,7 @@ function main() {
     });
     setupSlider("#scaleZ", {
         value: selectedNode.scale[2],
-        slide: updateScale(2, selectedNode),
+        slide: updateScale(2),
         min: -5,
         max: 5,
         step: 0.01,
@@ -180,11 +192,19 @@ function main() {
         drawScene()
     });
 
+    function updateRadius() {
+        return function (_event: any, ui: { value: number; }) {
+            if (!selectedNode) return
+            selectedCamera.translation[2] = ui.value;
+            drawScene();
+        };
+    }
+
     function setupRadiusCam() {
         setupSlider("#radiusCam", {
             name: "Radius",
             value: selectedCamera.translation[2],
-            slide: updatePosition(2, selectedCamera),
+            slide: updateRadius(),
             min: 0,
             max: 3000
         });
@@ -245,33 +265,34 @@ function main() {
         }
     }
 
-    const setSelectedNode = (node: Node) => {
+    function setSelectedNode(node: Node) {
         selectedNode = node;
+        console.log(selectedNode)
     }
 
     const objectList = document.getElementById('objectList') as HTMLElement;
 
-    function updatePosition(index: number, node: Node) {
-        if (!selectedNode) return
+    function updatePosition(index: number) {
         return function (_event: any, ui: { value: number; }) {
-            node.translation[index] = ui.value;
+            if (!selectedNode) return
+            selectedNode.translation[index] = ui.value;
             drawScene();
         };
     }
 
-    function updateRotation(index: number, node: Node) {
-        if (!selectedNode) return
+    function updateRotation(index: number) {
         return function (_event: any, ui: { value: any; }) {
+            if (!selectedNode) return
             let angleInDegrees = ui.value;
-            node.rotation[index] = angleInDegrees * Math.PI / 180;
+            selectedNode.rotation[index] = angleInDegrees * Math.PI / 180;
             drawScene();
         };
     }
 
-    function updateScale(index: number, node: Node) {
-        if (!selectedNode) return
+    function updateScale(index: number) {
         return function (_event: any, ui: { value: number; }) {
-            node.scale[index] = ui.value;
+            if (!selectedNode) return
+            selectedNode.scale[index] = ui.value;
             drawScene();
         };
     }
@@ -433,6 +454,14 @@ function main() {
         };
     }
 
+    function updateLightPosition(index: number) {
+        return function (_event: any, ui: { value: number; }) {
+            if (!selectedLight) return
+            selectedLight.translation[index] = ui.value;
+            drawScene();
+        };
+    }
+
     function setupLightProp() {
         if (!selectedLight) return
         setupLightColor()
@@ -440,7 +469,7 @@ function main() {
             clearPointLightProp()
             setupSlider("#lightDirX", {
                 value: selectedLight.translation[0],
-                slide: updatePosition(0, selectedLight),
+                slide: updateLightPosition(0),
                 min: -100,
                 max: 100,
                 step: 1,
@@ -448,7 +477,7 @@ function main() {
             });
             setupSlider("#lightDirY", {
                 value: selectedLight.translation[1],
-                slide: updatePosition(1, selectedLight),
+                slide: updateLightPosition(1),
                 min: -100,
                 max: 100,
                 step: 1,
@@ -456,7 +485,7 @@ function main() {
             });
             setupSlider("#lightDirZ", {
                 value: selectedLight.translation[2],
-                slide: updatePosition(2, selectedLight),
+                slide: updateLightPosition(2),
                 min: -100,
                 max: 100,
                 step: 1,
@@ -466,7 +495,7 @@ function main() {
             clearDirectionalLightProp()
             setupSlider("#lightPosX", {
                 value: selectedLight.translation[0],
-                slide: updatePosition(0, selectedLight),
+                slide: updateLightPosition(0),
                 min: -100,
                 max: 100,
                 step: 1,
@@ -474,7 +503,7 @@ function main() {
             });
             setupSlider("#lightPosY", {
                 value: selectedLight.translation[1],
-                slide: updatePosition(1, selectedLight),
+                slide: updateLightPosition(1),
                 min: -100,
                 max: 100,
                 step: 1,
@@ -482,7 +511,7 @@ function main() {
             });
             setupSlider("#lightPosZ", {
                 value: selectedLight.translation[2],
-                slide: updatePosition(2, selectedLight),
+                slide: updateLightPosition(2),
                 min: -300,
                 max: 3000,
                 step: 1,
@@ -566,17 +595,65 @@ function main() {
         }
     });
 
+
+    // Create a texture to render to
+    const pickerTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, pickerTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    if (pickerTexture === null) throw new Error('Error picker texture');
+
+    const pickerDepthBuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, pickerDepthBuffer);
+
+    if (pickerDepthBuffer === null) throw new Error('Error picker depth buffer');
+
+    const pickerFrameBuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pickerFrameBuffer);
+
+    if (pickerFrameBuffer === null) throw new Error('Error picker frame buffer');
+
+    const attachmentPoint = gl.COLOR_ATTACHMENT0;
+    const level = 0;
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, pickerTexture, level);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickerDepthBuffer);
+
+    let mouseX = -1;
+    let mouseY = -1;
+
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+        handleClick(gl, mouseX, mouseY, pickerFrameBuffer, canvas)
+    });
+
     // Draw the scene.
     function drawScene() {
         setupCanvas(<HTMLCanvasElement>gl.canvas, gl)
-        adjustCanvasSizetoCam(selectedCamera, gl)
-        selectedCamera.computeWorldMatrix()
 
         let lastUsedProgramInfo: ProgramInfo | null = null;
         let lastUsedGeometry: BufferGeometry | null = null;
 
-        if (!selectedNode || !rootNode || !basicProgramInfo || !phongProgramInfo) return
+        if (!selectedNode || !rootNode || !basicProgramInfo || !phongProgramInfo || !pickProgramInfo) return
         calculateTransformation(selectedNode)
+
+        if (!pickerTexture || !pickerDepthBuffer) return;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickerFrameBuffer);
+        if (resizeCanvasToDisplaySize(<HTMLCanvasElement>gl.canvas, gl)) {
+            setFramebufferAttachmentSizes(gl, gl.canvas.width, gl.canvas.height, pickerTexture, pickerDepthBuffer)
+            adjustCanvasSizetoCam(selectedCamera, gl)
+        }
+        selectedCamera.computeWorldMatrix()
+
+        drawMesh(rootNode, selectedCamera, selectedLight, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry, pickProgramInfo)
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        // Draw object to canvas
         drawMesh(rootNode, selectedCamera, selectedLight, gl, basicProgramInfo, phongProgramInfo, lastUsedProgramInfo, lastUsedGeometry)
 
         const primitiveType = gl.TRIANGLES;

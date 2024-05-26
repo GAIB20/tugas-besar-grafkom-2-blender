@@ -22,6 +22,7 @@ export function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement, gl: WebGLRe
     }
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    return needResize
 }
 
 export function createShader(gl: WebGLRenderingContext, type: GLenum, source: string) {
@@ -349,4 +350,21 @@ export function createProgramInfo(gl: WebGLRenderingContext, vertexShader: WebGL
         attributeSetters: createAttributeSetters(gl, program),
         uniformSetters: createUniformSetters(gl, program),
     };
+}
+
+export function setFramebufferAttachmentSizes(gl: WebGLRenderingContext, width: number, height: number, texture: WebGLTexture, depthBuffer: WebGLRenderbuffer) {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    // define size and format of level 0
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const border = 0;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    const data = null;
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+        width, height, border,
+        format, type, data);
+
+    gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
 }
