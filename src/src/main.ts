@@ -42,6 +42,9 @@ import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
 import {DirectionalLight} from "./classes/light/directional-light.ts";
 import {PointLight} from "./classes/light/point-light.ts";
 import {pickFrag, pickVert} from "./shaders/pick.ts";
+import {PhongMaterial} from "./classes/phong-material.ts";
+import {OrthographicCamera} from "./classes/camera/orthographic-camera.ts";
+import {ObliqueCamera} from "./classes/camera/oblique-camera.ts";
 
 // GLOBAL VARIABLE
 let playAnimationTime: number | undefined = undefined;
@@ -562,6 +565,7 @@ function main() {
     // Save and Load
     document.getElementById("downloadButton")?.addEventListener("click", () => {
         if (!rootNode) return;
+        console.log(Node.nodes)
         saveToJson(rootNode, animator?.data);
     });
 
@@ -589,10 +593,30 @@ function main() {
                             removeNode(selectedCamera)
                             selectedCamera = camera
                             originNode.add(selectedCamera)
-                            drawScene()
+                            if (camera instanceof OrthographicCamera) {
+                                projectionSelect.value = 'orthographic'
+                            } else if (camera instanceof ObliqueCamera) {
+                                projectionSelect.value = 'oblique'
+                            } else {
+                                projectionSelect.value = 'perspective'
+                            }
                             setupRadiusCam()
                         }
-                        if (light) selectedLight = light
+                        if (selectedNode instanceof Mesh && selectedNode.material instanceof PhongMaterial) {
+                            materialSelect.value = 'phong'
+                        } else {
+                            materialSelect.value = 'basic'
+                        }
+                        setupMaterialProp()
+                        if (light) {
+                            selectedLight = light
+                            if (light instanceof DirectionalLight) {
+                                lightSelect.value = 'directional'
+                            } else {
+                                lightSelect.value = 'point'
+                            }
+                            setupLightProp()
+                        }
                         drawScene()
                     } catch (error) {
                         console.error('Error parsing JSON:', error);

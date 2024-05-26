@@ -44,7 +44,6 @@ export interface IModel {
 }
 
 export const saveToJson = (rootNode: Node, animationData?: IAnimation) => {
-    console.log(Node.nodes)
     let result: IModel = {
         scene: 0,
         scenes: [
@@ -185,6 +184,9 @@ export const loadFromJson = (model: IModel, onloadCallback: () => void, meshCall
             if (typeLight == "point" && model.lights[0].point) {
                 light = new PointLight(typeLight)
                 light.fromObjectLight(model.lights[0])
+            }
+            else {
+                light = new DirectionalLight(typeLight)
             }
             light.fromObject(node)
         } else {
