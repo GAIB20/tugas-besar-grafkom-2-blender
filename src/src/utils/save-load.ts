@@ -15,6 +15,13 @@ import {PhongMaterial} from "../classes/phong-material.ts";
 import {BufferGeometry} from "../classes/buffer-geometry.ts";
 import {IAnimation} from "../interfaces/animation.ts";
 import {Light} from "../classes/light/light.ts";
+import {ILight} from "../interfaces/light.ts";
+import {OrthographicCamera} from "../classes/camera/orthographic-camera.ts";
+import {ObliqueCamera} from "../classes/camera/oblique-camera.ts";
+import {degToRad} from "./web-gl.ts";
+import {PerspectiveCamera} from "../classes/camera/perspective-camera.ts";
+import {PointLight} from "../classes/light/point-light.ts";
+import {DirectionalLight} from "../classes/light/directional-light.ts";
 
 
 interface IScene {
@@ -30,12 +37,14 @@ export interface IModel {
     bufferViews: IBufferView[],
     accessors: IAccessor[],
     cameras: ICamera[],
+    lights: ILight[],
     materials: IMaterial[],
     textures: ITexture[]
     animation: IAnimation[]
 }
 
 export const saveToJson = (rootNode: Node, animationData?: IAnimation) => {
+    console.log(Node.nodes)
     let result: IModel = {
         scene: 0,
         scenes: [
@@ -49,6 +58,7 @@ export const saveToJson = (rootNode: Node, animationData?: IAnimation) => {
         bufferViews: [],
         accessors: [],
         cameras: [],
+        lights: [],
         materials: [],
         textures: [],
         animation: []
@@ -63,6 +73,9 @@ export const saveToJson = (rootNode: Node, animationData?: IAnimation) => {
         } else if (node instanceof Camera) {
             result.nodes[i]['camera'] = 0;
             result.cameras.push(node.toObjectCamera())
+        } else if (node instanceof Light) {
+            result.nodes[i]['light'] = 0;
+            result.lights.push(node.toObjectLight())
         }
     }
 
@@ -103,10 +116,10 @@ export interface ILoadModel {
     rootNode: Node
     animation: IAnimation
     camera?: Camera
-    light?: Light
+    light?: DirectionalLight | PointLight
 }
 
-export const loadFromJson = (model: IModel, onloadCallback: () => void): ILoadModel => {
+export const loadFromJson = (model: IModel, onloadCallback: () => void, meshCallback: (node: Node) => void): ILoadModel => {
     model.textures.forEach((texture) => {
         let newText = new Texture()
         newText.setData(texture.src)
@@ -138,6 +151,9 @@ export const loadFromJson = (model: IModel, onloadCallback: () => void): ILoadMo
         });
     }
 
+    let camera: Camera;
+    let light: DirectionalLight | PointLight;
+
     model.nodes.forEach((node) => {
         if (node.mesh !== undefined) {
             let newGeometry = new BufferGeometry()
@@ -148,10 +164,29 @@ export const loadFromJson = (model: IModel, onloadCallback: () => void): ILoadMo
             let basicMaterial = ShaderMaterial.Materials[model.meshes[node.mesh].basicMaterial]
             let phongMaterial = ShaderMaterial.Materials[model.meshes[node.mesh].phongMaterial]
             if (basicMaterial instanceof BasicMaterial && phongMaterial instanceof PhongMaterial) {
-                let newMesh = new Mesh(node.name, newGeometry, basicMaterial, phongMaterial)
+                let newMesh = new Mesh(node.name, newGeometry, basicMaterial, phongMaterial, meshCallback)
                 newMesh.fromObject(node)
                 newMesh.material = model.meshes[node.mesh].material === 'basic' ? newMesh.basicMaterial : newMesh.phongMaterial;
             }
+        } else if (node.camera !== undefined) {
+            let typeCam = model.cameras[0].type
+            if (typeCam === 'orthographic' && model.cameras[0].orthographic) {
+                camera = new OrthographicCamera(typeCam, model.cameras[0].orthographic.width, model.cameras[0].orthographic.height, model.cameras[0].orthographic.near, model.cameras[0].orthographic.far);
+            } else if (typeCam === 'oblique' && model.cameras[0].oblique) {
+                camera = new ObliqueCamera(typeCam, model.cameras[0].oblique.width, model.cameras[0].oblique.height, model.cameras[0].oblique.near, model.cameras[0].oblique.far, degToRad(55), degToRad(55));
+            } else if (typeCam === 'perspective' && model.cameras[0].perspective) {
+                camera = new PerspectiveCamera(typeCam, model.cameras[0].perspective.fovY, model.cameras[0].perspective.aspect, model.cameras[0].perspective.near, model.cameras[0].perspective.far)
+            }
+            if (camera) {
+                camera.fromObject(node)
+            }
+        } else if (node.light !== undefined) {
+            let typeLight = model.lights[0].type
+            if (typeLight == "point" && model.lights[0].point) {
+                light = new PointLight(typeLight)
+                light.fromObjectLight(model.lights[0])
+            }
+            light.fromObject(node)
         } else {
             let newNode = new Node(node.name)
             newNode.fromObject(node)
@@ -168,5 +203,17 @@ export const loadFromJson = (model: IModel, onloadCallback: () => void): ILoadMo
     console.log(rootNodeIdx)
     console.log(Node.nodes)
 
-    return {rootNode: Node.nodes[rootNodeIdx], animation: model.animation[0]}
+    let result: ILoadModel = {
+        rootNode: Node.nodes[rootNodeIdx], animation: model.animation[0]
+    }
+    // @ts-ignore
+    if (camera) {
+        result["camera"] = camera
+    }
+    // @ts-ignore
+    if (light) {
+        result["light"] = light
+    }
+
+    return result
 }

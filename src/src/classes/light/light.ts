@@ -1,5 +1,6 @@
 import {Node} from "../node.ts"
 import {UniformSet} from "../../types/web-gl.ts";
+import {ILight} from "../../interfaces/light.ts";
 
 export type LightOptions = {
     color?: Color;
@@ -24,5 +25,9 @@ export class Light extends Node {
     set color(color: Color) {
         this._color = color;
         this._uniforms['lightColor'] = color;
+    }
+
+    toObjectLight(): ILight {
+        throw new Error("Light.toObjectLight() must be implemented in derived classes.");
     }
 }

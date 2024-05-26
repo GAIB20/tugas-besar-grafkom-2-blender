@@ -577,12 +577,22 @@ function main() {
                         const jsonObject: IModel = JSON.parse(event.target.result);
                         console.log(jsonObject);
                         let {
-                            rootNode: newRoot, animation
-                        } = loadFromJson(jsonObject, drawScene)
+                            rootNode: newRoot, animation, camera, light
+                        } = loadFromJson(jsonObject, drawScene, setSelectedNode)
                         rootNode = newRoot
                         selectedNode = rootNode
                         createObjectHierarcy(rootNode, objectList, setSelectedNode);
                         animator = new AnimationController(rootNode, animation, drawScene)
+                        if (camera) {
+                            camera.computeProjectionMatrix()
+                            originNode.remove(selectedCamera)
+                            removeNode(selectedCamera)
+                            selectedCamera = camera
+                            originNode.add(selectedCamera)
+                            drawScene()
+                            setupRadiusCam()
+                        }
+                        if (light) selectedLight = light
                         drawScene()
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
