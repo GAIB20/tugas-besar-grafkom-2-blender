@@ -211,6 +211,13 @@ export class AnimationController {
     }
 
     createTweenControl(parent: HTMLElement) {
+        let div = document.createElement("div");
+        div.className = "flex flex-wrap justify-center items-center gap-2";
+
+        let label = document.createElement("p");
+        label.innerHTML = "Tweening: ";
+
+
         let dropdown = document.createElement("select");
         dropdown.className = 'bg-purple-900 text-white w-32 p-1 border-none rounded mt-3';
         let tweenings = ["None", "Back", "Circular", "Cubic", "Expotential", "Quad", "Quart", "Sine"];
@@ -228,7 +235,9 @@ export class AnimationController {
             this._tweening = (event.target as HTMLSelectElement).value;
         }
 
-        parent.appendChild(dropdown);
+        div.appendChild(label);
+        div.appendChild(dropdown);
+        parent.appendChild(div);
     }
 
     animateNode(){
