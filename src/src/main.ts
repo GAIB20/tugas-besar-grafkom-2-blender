@@ -1,11 +1,12 @@
 import './style.css'
 import {createProgramInfo, createShader, radToDeg, resizeCanvasToDisplaySize} from "./utils/web-gl.ts";
 import {
-    clearDirectionalLightProp,
+    clearBasicMaterialProp,
+    clearDirectionalLightProp, clearPhongMaterialProp,
     clearPointLightProp,
     createObjectHierarcy,
     setupColorPicker,
-    setupSlider
+    setupSlider, showPhongMaterialProp
 } from "./utils/ui.ts";
 import {
     adjustCanvasSizetoCam,
@@ -317,7 +318,7 @@ function main() {
         if (!(selectedNode instanceof Mesh)) return
         selectedMaterialOpt = materialSelect.value
         if (selectedMaterialOpt === 'basic') {
-            document.getElementById('phongProp')!.innerHTML = ''
+            clearPhongMaterialProp()
             selectedNode.material = selectedNode.basicMaterial;
             setupColorPicker('#basicProp', {
                 name: "Color Basic",
@@ -325,7 +326,8 @@ function main() {
                 picker: updateColor('basic')
             })
         } else {
-            document.getElementById('basicProp')!.innerHTML = ''
+            clearBasicMaterialProp()
+            showPhongMaterialProp()
             selectedNode.material = selectedNode.phongMaterial;
             setupColorPicker('#diffuseColor', {
                 name: "Diffuse Color",

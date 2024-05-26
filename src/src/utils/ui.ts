@@ -215,3 +215,27 @@ export function clearDirectionalLightProp() {
     document.getElementById('lightDirY')!.innerHTML = ''
     document.getElementById('lightDirZ')!.innerHTML = ''
 }
+
+export function clearBasicMaterialProp() {
+    document.getElementById('basicProp')!.innerHTML = ''
+}
+
+export function showPhongMaterialProp() {
+    const elements = document.getElementsByClassName('phong-properties');
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].classList.remove('hidden');
+    }
+}
+
+export function clearPhongMaterialProp() {
+    document.getElementById('diffuseColor')!.innerHTML = ''
+    document.getElementById('ambientColor')!.innerHTML = ''
+    document.getElementById('specularColor')!.innerHTML = ''
+    document.getElementById('shininess')!.innerHTML = ''
+    document.getElementById('displacementBias')!.innerHTML = ''
+    document.getElementById('displacementFactor')!.innerHTML = ''
+    const elements = document.getElementsByClassName('phong-properties');
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].classList.add('hidden');
+    }
+}
