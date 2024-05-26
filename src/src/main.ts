@@ -10,7 +10,7 @@ import {
     clearBasicMaterialProp,
     clearDirectionalLightProp, clearNodeProp, clearPhongMaterialProp,
     clearPointLightProp,
-    createObjectHierarcy,
+    createObjectHierarcy, setActiveNode,
     setupColorPicker,
     setupSlider, showNodeProp, showPhongMaterialProp
 } from "./utils/ui.ts";
@@ -267,6 +267,7 @@ function main() {
     }
 
     function setSelectedNode(node: Node) {
+        setActiveNode(node, selectedNode)
         selectedNode = node;
         setupTransformationNode()
         if (selectedNode instanceof Mesh && selectedNode.material instanceof BasicMaterial) {
@@ -593,11 +594,12 @@ function main() {
                             rootNode: newRoot, animation, camera, light
                         } = loadFromJson(jsonObject, drawScene, setSelectedNode)
                         rootNode = newRoot
-                        showNodeProp()
-                        setSelectedNode(rootNode)
 
                         objectList.innerHTML = ''
                         createObjectHierarcy(rootNode, objectList, setSelectedNode);
+
+                        showNodeProp()
+                        setSelectedNode(rootNode)
 
                         animator = new AnimationController(rootNode, animation, drawScene)
 

@@ -158,18 +158,20 @@ export function createButton(parent: HTMLElement | null, options: { name: any; o
 
 export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelectedNode: (node: Node) => void) {
     // parent.innerHTML = ''
-    const styleIl: string = 'inline-block w-full p-4 bg-purple-900 text-white rounded';
-    const styleButton: string = 'inline-block p-1 px-2 mx-2 bg-blue-600 text-white rounded hover:bg-blue-700';
+    const styleIl: string = 'inline-block w-full pl-4 py-1 bg-purple-900 rounded';
+    const styleButton: string = 'inline-block px-2 py-1 text-white bg-transparent hover:bg-white hover:text-purple-900 rounded border border-white';
     // const styleUl : string = 'fill-current';
 
     if (node.children.length === 0) {
         const il = document.createElement('il');
-        il.innerHTML = node.name; // node.name
+        // il.innerHTML = node.name; // node.name
         il.className = styleIl;
         parent.appendChild(il);
 
         const button = document.createElement('button');
-        button.textContent = 'select';
+        console.log(node.idNode)
+        button.id = `node-${node.idNode}`
+        button.textContent = node.name;
         button.className = styleButton;
         button.addEventListener('click', () => {
             setSelectedNode(node)
@@ -177,12 +179,13 @@ export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelecte
         il.appendChild(button);
     } else {
         const il = document.createElement('il');
-        il.innerHTML = node.name; // node.name
+        // il.innerHTML = node.name; // node.name
         il.className = styleIl;
         parent.appendChild(il);
 
         const button = document.createElement('button');
-        button.textContent = 'select';
+        button.id = `node-${node.idNode}`
+        button.textContent = node.name;
         button.className = styleButton;
         button.addEventListener('click', () => {
             setSelectedNode(node)
@@ -251,5 +254,33 @@ export function showNodeProp() {
     const elements = document.getElementsByClassName('selected-node-prop');
     for (let i = 0; i < elements.length; i++) {
         elements[i].classList.remove('hidden');
+    }
+}
+
+export function setActiveNode(newNode: Node, lastNode: Node | null) {
+    console.log()
+    if (lastNode) {
+        const lastNodeId = `node-${lastNode.idNode}`;
+        const element = document.getElementById(lastNodeId);
+        if (element) {
+            element.classList.remove('hover:bg-white/80');
+            element.classList.remove('bg-white');
+            element.classList.remove('text-purple-900');
+            element.classList.add('text-white');
+            element.classList.add('bg-transparent');
+            element.classList.add('hover:bg-white');
+            element.classList.add('hover:text-purple-900');
+        }
+    }
+    const newNodeId = `node-${newNode.idNode}`;
+    const newElement = document.getElementById(newNodeId);
+    if (newElement) {
+        newElement.classList.remove('text-white');
+        newElement.classList.remove('bg-transparent');
+        newElement.classList.remove('hover:bg-white');
+        newElement.classList.remove('hover:text-purple-900');
+        newElement.classList.add('hover:bg-white/80');
+        newElement.classList.add('bg-white');
+        newElement.classList.add('text-purple-900');
     }
 }
