@@ -1,4 +1,5 @@
 import {IAccessor, IBuffer, IBufferView} from "../interfaces/buffer.ts";
+import {IBufferSubtree} from "../interfaces/subtree.ts";
 
 type TypedArray = Float32Array | Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array;
 
@@ -118,7 +119,6 @@ export class BufferAttribute {
         this._isDirty = true;
         // Set elemen[index] dengan data (data.length == this._size)
         // Jangan lupa untuk menyesuaikan dengan offset dan stride.
-        //TODO: check offset and stride
         index *= this._size;
         for (let i = 0; i < data.length; i++) {
             this._data[index + i] = data[i];
@@ -132,7 +132,6 @@ export class BufferAttribute {
         const data: number[] = new Array(size);
         // Ambil elemen[index] ke data (data.length == size)
         // Jangan lupa untuk menyesuaikan dengan offset dan stride.
-        //TODO: check offset and stride
         for (let i = 0; i < size; i++) {
             data[i] = this._data[index + i];
         }
@@ -158,6 +157,15 @@ export class BufferAttribute {
             bufferView: this.id,
             byteOffset: this.offset,
             componentType: this.dtype,
+            count: this.count,
+        }
+    }
+
+    toObjectSubtree(): IBufferSubtree {
+        return {
+            data: Array.from(this.data),
+            componentType: this.dtype,
+            byteLength: this.length,
             count: this.count,
         }
     }

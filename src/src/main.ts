@@ -8,11 +8,11 @@ import {
 } from "./utils/web-gl.ts";
 import {
     clearBasicMaterialProp,
-    clearDirectionalLightProp, clearPhongMaterialProp,
+    clearDirectionalLightProp, clearNodeProp, clearPhongMaterialProp,
     clearPointLightProp,
-    createObjectHierarcy,
+    createObjectHierarcy, setActiveNode,
     setupColorPicker,
-    setupSlider, showPhongMaterialProp
+    setupSlider, showNodeProp, showPhongMaterialProp
 } from "./utils/ui.ts";
 import {
     adjustCanvasSizetoCam,
@@ -27,24 +27,25 @@ import {basicFrag, basicVert} from "./shaders/basic.ts";
 import {Mesh} from "./classes/mesh.ts";
 import {ProgramInfo} from "./types/web-gl.ts";
 import {
+    addDefault,
     calculateTransformation,
     cleanupObjects,
     drawMesh, handleClick,
-    removeNode,
-    setupScene
+    removeNode
 } from "./utils/scene.ts";
 import {Node} from "./classes/node.ts";
 import {AnimationController} from "./classes/animation/animation-controller.ts";
 import {createButton} from "./utils/ui.ts";
 import {hexToRgb, rgbToHex} from "./utils/color.ts";
 import {phongFrag, phongVert} from "./shaders/phong.ts";
-import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
+import {IModel, loadFromJson, loadSubtreeFromJson, saveSubtreeToJson, saveToJson} from "./utils/save-load.ts";
 import {DirectionalLight} from "./classes/light/directional-light.ts";
 import {PointLight} from "./classes/light/point-light.ts";
 import {pickFrag, pickVert} from "./shaders/pick.ts";
-import {PhongMaterial} from "./classes/phong-material.ts";
 import {OrthographicCamera} from "./classes/camera/orthographic-camera.ts";
 import {ObliqueCamera} from "./classes/camera/oblique-camera.ts";
+import {BasicMaterial} from "./classes/basic-material.ts";
+import {IMeshSubtree} from "./interfaces/subtree.ts";
 
 // GLOBAL VARIABLE
 let playAnimationTime: number | undefined = undefined;
@@ -77,10 +78,6 @@ function main() {
     const canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement
     resizeCanvasToDisplaySize(canvas, gl);
 
-    rootNode = setupScene(drawScene, setSelectedNode);
-    selectedNode = rootNode
-
-    // animator = new AnimationController(selectedNode, 'src/classes/animation/anim.json', drawScene);
     createButton(document.getElementById('animation'), {
         name: "Play / Pause", onClick: () => {
             if (!animator) {
@@ -100,73 +97,76 @@ function main() {
     })
 
 
-    // Setup a ui.
-    setupSlider("#x", {
-        name: "Translate x",
-        value: selectedNode.translation[0],
-        slide: updatePosition(0),
-        min: -gl.canvas.width,
-        max: gl.canvas.width
-    });
-    setupSlider("#y", {
-        name: "Translate y",
-        value: selectedNode.translation[1],
-        slide: updatePosition(1),
-        min: -gl.canvas.height,
-        max: gl.canvas.height
-    });
-    setupSlider("#z", {
-        name: "Translate z",
-        value: selectedNode.translation[2],
-        slide: updatePosition(2),
-        min: -gl.canvas.height,
-        max: gl.canvas.height
-    });
-    setupSlider("#angleX", {
-        name: "Rotate x",
-        value: radToDeg(selectedNode.rotation[0]),
-        slide: updateRotation(0),
-        max: 360
-    });
-    setupSlider("#angleY", {
-        name: "Rotate y",
-        value: radToDeg(selectedNode.rotation[1]),
-        slide: updateRotation(1),
-        max: 360
-    });
-    setupSlider("#angleZ", {
-        name: "Rotate z",
-        value: radToDeg(selectedNode.rotation[2]),
-        slide: updateRotation(2),
-        max: 360
-    });
-    setupSlider("#scaleX", {
-        value: selectedNode.scale[0],
-        slide: updateScale(0),
-        min: -5,
-        max: 5,
-        step: 0.01,
-        precision: 2,
-        name: "Scale x",
-    });
-    setupSlider("#scaleY", {
-        value: selectedNode.scale[1],
-        slide: updateScale(1),
-        min: -5,
-        max: 5,
-        step: 0.01,
-        precision: 2,
-        name: "Scale y",
-    });
-    setupSlider("#scaleZ", {
-        value: selectedNode.scale[2],
-        slide: updateScale(2),
-        min: -5,
-        max: 5,
-        step: 0.01,
-        precision: 2,
-        name: "Scale z",
-    });
+    // Setup selected node TRS
+    function setupTransformationNode() {
+        if (!selectedNode) return
+        setupSlider("#x", {
+            name: "Translate x",
+            value: selectedNode.translation[0],
+            slide: updatePosition(0),
+            min: -gl.canvas.width,
+            max: gl.canvas.width
+        });
+        setupSlider("#y", {
+            name: "Translate y",
+            value: selectedNode.translation[1],
+            slide: updatePosition(1),
+            min: -gl.canvas.height,
+            max: gl.canvas.height
+        });
+        setupSlider("#z", {
+            name: "Translate z",
+            value: selectedNode.translation[2],
+            slide: updatePosition(2),
+            min: -gl.canvas.height,
+            max: gl.canvas.height
+        });
+        setupSlider("#angleX", {
+            name: "Rotate x",
+            value: radToDeg(selectedNode.rotation[0]),
+            slide: updateRotation(0),
+            max: 360
+        });
+        setupSlider("#angleY", {
+            name: "Rotate y",
+            value: radToDeg(selectedNode.rotation[1]),
+            slide: updateRotation(1),
+            max: 360
+        });
+        setupSlider("#angleZ", {
+            name: "Rotate z",
+            value: radToDeg(selectedNode.rotation[2]),
+            slide: updateRotation(2),
+            max: 360
+        });
+        setupSlider("#scaleX", {
+            value: selectedNode.scale[0],
+            slide: updateScale(0),
+            min: -5,
+            max: 5,
+            step: 0.01,
+            precision: 2,
+            name: "Scale x",
+        });
+        setupSlider("#scaleY", {
+            value: selectedNode.scale[1],
+            slide: updateScale(1),
+            min: -5,
+            max: 5,
+            step: 0.01,
+            precision: 2,
+            name: "Scale y",
+        });
+        setupSlider("#scaleZ", {
+            value: selectedNode.scale[2],
+            slide: updateScale(2),
+            min: -5,
+            max: 5,
+            step: 0.01,
+            precision: 2,
+            name: "Scale z",
+        });
+    }
 
     // Camera
     const projectionSelect = document.getElementById('projection') as HTMLSelectElement
@@ -272,8 +272,16 @@ function main() {
     }
 
     function setSelectedNode(node: Node) {
+        setActiveNode(node, selectedNode)
         selectedNode = node;
-        console.log(selectedNode)
+        setupTransformationNode()
+        if (selectedNode instanceof Mesh && selectedNode.material instanceof BasicMaterial) {
+            materialSelect.value = 'basic'
+        }
+        else {
+            materialSelect.value = 'phong'
+        }
+        setupMaterialProp()
     }
 
     const objectList = document.getElementById('objectList') as HTMLElement;
@@ -304,7 +312,7 @@ function main() {
     }
 
     // Material
-    let selectedMaterialOpt = 'phong';
+    let selectedMaterialOpt = 'basic';
     const materialSelect = document.getElementById('material') as HTMLSelectElement;
 
     function updateColor(type: string) {
@@ -403,10 +411,13 @@ function main() {
         drawScene()
     });
     document.addEventListener('DOMContentLoaded', () => {
+        if (!rootNode) {
+            clearNodeProp()
+            return
+        }
         setupMaterialProp()
         setupLightProp()
         drawScene()
-        if (!rootNode) return
         objectList.innerHTML = ''
         createObjectHierarcy(rootNode, objectList, setSelectedNode);
     })
@@ -588,10 +599,15 @@ function main() {
                             rootNode: newRoot, animation, camera, light
                         } = loadFromJson(jsonObject, drawScene, setSelectedNode)
                         rootNode = newRoot
-                        selectedNode = rootNode
+
                         objectList.innerHTML = ''
                         createObjectHierarcy(rootNode, objectList, setSelectedNode);
+
+                        showNodeProp()
+                        setSelectedNode(rootNode)
+
                         animator = new AnimationController(rootNode, animation, drawScene)
+
                         if (camera) {
                             camera.computeProjectionMatrix()
                             originNode.remove(selectedCamera)
@@ -607,12 +623,7 @@ function main() {
                             }
                             setupRadiusCam()
                         }
-                        if (selectedNode instanceof Mesh && selectedNode.material instanceof PhongMaterial) {
-                            materialSelect.value = 'phong'
-                        } else {
-                            materialSelect.value = 'basic'
-                        }
-                        setupMaterialProp()
+
                         if (light) {
                             selectedLight = light
                             if (light instanceof DirectionalLight) {
@@ -623,6 +634,7 @@ function main() {
                             setupLightProp()
                         }
                         drawScene()
+                        input.value = ''
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                     }
@@ -668,6 +680,58 @@ function main() {
         mouseY = e.clientY - rect.top;
         handleClick(gl, mouseX, mouseY, pickerFrameBuffer, canvas)
     });
+
+    // Component Editor
+    const addDefaultBtn = document.getElementById('addDefault') as HTMLButtonElement
+    const deleteComponentBtn = document.getElementById('deleteComponent') as HTMLButtonElement
+    const exportSubtreeBtn = document.getElementById('exportSubtree') as HTMLButtonElement
+    const importSubtreeBtn = document.getElementById('importSubtree') as HTMLButtonElement
+
+    addDefaultBtn.addEventListener('click', () => {
+        if (!selectedNode || !rootNode) return
+        addDefault(selectedNode, drawScene, setSelectedNode)
+        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+        drawScene()
+    })
+    deleteComponentBtn.addEventListener('click', () => {
+        if (!selectedNode || !rootNode) return
+        removeNode(selectedNode)
+        objectList.innerHTML = ''
+        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+        setSelectedNode(rootNode)
+        drawScene()
+    })
+    exportSubtreeBtn.addEventListener('click', () => {
+        if (!selectedNode || !(selectedNode instanceof Mesh)) return
+        saveSubtreeToJson(selectedNode)
+    })
+    importSubtreeBtn.addEventListener('click', () => {
+        const importSubtreeInput = document.getElementById('subtreeInput') as HTMLInputElement
+        if (importSubtreeInput.files && importSubtreeInput.files[0]) {
+            cleanupObjects()
+            const file = importSubtreeInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                if (!selectedNode || !rootNode) return
+                if (event.target && typeof event.target.result === 'string') {
+                    try {
+                        const jsonObject: IMeshSubtree[] = JSON.parse(event.target.result);
+                        console.log(jsonObject)
+                        loadSubtreeFromJson(selectedNode, jsonObject, drawScene, setSelectedNode)
+                        importSubtreeInput.value = ''
+                        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+                        drawScene()
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert('Please select a JSON file first.');
+        }
+    });
+
 
     // Draw the scene.
     function drawScene() {

@@ -22,6 +22,7 @@ import {degToRad} from "./web-gl.ts";
 import {PerspectiveCamera} from "../classes/camera/perspective-camera.ts";
 import {PointLight} from "../classes/light/point-light.ts";
 import {DirectionalLight} from "../classes/light/directional-light.ts";
+import {IMeshSubtree} from "../interfaces/subtree.ts";
 
 
 interface IScene {
@@ -184,8 +185,7 @@ export const loadFromJson = (model: IModel, onloadCallback: () => void, meshCall
             if (typeLight == "point" && model.lights[0].point) {
                 light = new PointLight(typeLight)
                 light.fromObjectLight(model.lights[0])
-            }
-            else {
+            } else {
                 light = new DirectionalLight(typeLight)
             }
             light.fromObject(node)
@@ -202,8 +202,6 @@ export const loadFromJson = (model: IModel, onloadCallback: () => void, meshCall
     }
 
     const rootNodeIdx = model.scenes[model.scene].nodes[0];
-    console.log(rootNodeIdx)
-    console.log(Node.nodes)
 
     let result: ILoadModel = {
         rootNode: Node.nodes[rootNodeIdx], animation: model.animation[0]
@@ -218,4 +216,84 @@ export const loadFromJson = (model: IModel, onloadCallback: () => void, meshCall
     }
 
     return result
+}
+
+
+export const saveSubtreeToJson = (rootNode: Mesh) => {
+    let result: IMeshSubtree[] = []
+
+    function meshToSubtree(currentMesh: Mesh) {
+        let meshSubtree = currentMesh.toObjectSubtree()
+        meshSubtree['children'] = []
+        currentMesh.children.forEach((mesh) => {
+            if (mesh instanceof Mesh) {
+                meshSubtree['children']?.push(mesh.toObjectSubtree())
+            }
+        })
+        result.push(meshSubtree)
+    }
+
+    meshToSubtree(rootNode)
+
+    const jsonStr = JSON.stringify(result, null, 2); // Pretty print with 2 spaces
+
+    const blob = new Blob([jsonStr], {type: "application/json"});
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = 'model';
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+export const loadSubtreeFromJson = (rootNode: Node, model: IMeshSubtree[], onloadCallback: () => void, meshCallback: (node: Node) => void) => {
+    function loadSubtree(parent: Node, meshSubtree: IMeshSubtree) {
+        let diffText = new Texture()
+        diffText.setData(meshSubtree.phongMaterial.diffuseTexture.src)
+        diffText.onLoad(onloadCallback)
+        let specText = new Texture()
+        specText.setData(meshSubtree.phongMaterial.specularTexture.src)
+        specText.onLoad(onloadCallback)
+        let normText = new Texture()
+        normText.setData(meshSubtree.phongMaterial.normalTexture.src)
+        normText.onLoad(onloadCallback)
+        let dispText = new Texture()
+        dispText.setData(meshSubtree.phongMaterial.displacementTexture.src)
+        dispText.onLoad(onloadCallback)
+
+        let basicMaterial = new BasicMaterial({color: meshSubtree.basicMaterial.color});
+        let phongMaterial = new PhongMaterial({
+            color: meshSubtree.phongMaterial.color,
+            ambientColor: meshSubtree.phongMaterial.ambientColor,
+            specularColor: meshSubtree.phongMaterial.specularColor,
+            shininess: meshSubtree.phongMaterial.shininess,
+            normalTexture: normText,
+            specularTexture: specText,
+            diffuseTexture: diffText,
+            displacementTexture: dispText,
+            displacementBias: meshSubtree.phongMaterial.displacementBias,
+            displacementFactor: meshSubtree.phongMaterial.displacementFactor
+        })
+
+        let newGeometry = new BufferGeometry()
+        let attributes = meshSubtree.attributes
+        for (const key in attributes) {
+            let size = meshSubtree.attributes[key].byteLength / meshSubtree.attributes[key].count
+            let buffer = new BufferAttribute(new Float32Array(meshSubtree.attributes[key].data), size, {
+                dtype: meshSubtree.attributes[key].componentType,
+                offset: 0
+            });
+            newGeometry.setAttribute(key, buffer)
+        }
+        let newMesh = new Mesh(meshSubtree.name, newGeometry, basicMaterial, phongMaterial, meshCallback)
+        parent.add(newMesh)
+        meshSubtree.children?.forEach((child) => {
+            loadSubtree(newMesh, child)
+        })
+    }
+
+    model.forEach((meshSubtree) => loadSubtree(rootNode, meshSubtree))
 }
