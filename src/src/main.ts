@@ -404,6 +404,7 @@ function main() {
         setupLightProp()
         drawScene()
         if (!rootNode) return
+        objectList.innerHTML = ''
         createObjectHierarcy(rootNode, objectList, setSelectedNode);
     })
 
@@ -585,6 +586,7 @@ function main() {
                         } = loadFromJson(jsonObject, drawScene, setSelectedNode)
                         rootNode = newRoot
                         selectedNode = rootNode
+                        objectList.innerHTML = ''
                         createObjectHierarcy(rootNode, objectList, setSelectedNode);
                         animator = new AnimationController(rootNode, animation, drawScene)
                         if (camera) {

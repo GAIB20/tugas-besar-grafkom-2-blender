@@ -121,12 +121,12 @@
     <canvas id="webgl-canvas" class="w-full h-full cursor-grab"></canvas>
 </div>
 <div id=rightContainer class="flex flex-col h-full bg-purple-950 w-[18vw] p-4 gap-4 text-white overflow-y-scroll">
-    <ul id="objectList"></ul>
+    <ul id="objectList" class="overflow-y-auto" style="max-height: 50vh;"></ul>
     <h2 class="text-lg font-bold text-white">Animation</h2>
     <div id="animation" class="flex flex-col justify-center items-center w-full"></div>
     <h2 class="text-lg font-bold text-white">Model</h2>
     <button id="downloadButton" class="bg-white text-purple-900 rounded font-bold py-2">Save</button>
-    <input type="file" id="modelInput" accept=".json">
+    <input type="file" id="modelInput" accept=".json" class="h-fit">
     <button id="loadModelButton" class="bg-white text-purple-900 rounded font-bold py-2">Load</button>
 </div>
 <script type="module" src="src/main.ts"></script>
