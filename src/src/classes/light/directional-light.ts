@@ -10,7 +10,7 @@ export class DirectionalLight extends Light {
     }
 
     get direction() {
-        this._direction = this.translation.mul(-1).normalize();
+        this._direction = Vector3.multiply(this.translation, -1).normalize();
         return this._direction;
     }
 
