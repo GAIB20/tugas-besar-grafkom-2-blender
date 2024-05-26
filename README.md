@@ -45,3 +45,6 @@ Seluruh model terletak pada folder test
 * Articulated: danbo
 * Hollow: hollow-cube
 * Subtree: subtree-model (Contoh file untuk import subtree pada component editor)
+
+## Panduan
+Panduan dapat diakses di link berikut https://docs.google.com/document/d/1sa2zgwZgQHD_zJ9FKVb8EKhldkcc2bOrPjJiBBxmAdI/edit?usp=sharing
