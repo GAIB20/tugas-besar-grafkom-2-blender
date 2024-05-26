@@ -84,12 +84,14 @@ function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram
     function createAttributeSetter(info: WebGLActiveInfo): AttributeSetters {
         // Initialization Time
         const loc = gl.getAttribLocation(program, info.name);
-        const buf = gl.createBuffer();
+        // const buf = gl.createBuffer();
         return (...values) => {
             // Render Time (saat memanggil setAttributes() pada render loop)
-            gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+            // gl.bindBuffer(gl.ARRAY_BUFFER, buf);
             const v = values[0];
             if (v instanceof BufferAttribute) {
+                v._buffer = v._buffer || gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, v._buffer);
                 if (v.isDirty) {
                     // Data Changed Time (note that buffer is already binded)
                     gl.bufferData(gl.ARRAY_BUFFER, v.data, gl.STATIC_DRAW);
@@ -107,6 +109,7 @@ function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram
                     gl[`vertexAttrib${values.length}f`](loc, ...values);
                 }
             }
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
     }
 
@@ -137,55 +140,6 @@ export function setAttributes(
     for (let attributeName in attributes)
         setAttribute(programInfo, attributeName, attributes[attributeName]);
 }
-
-// function createUniformSetters(
-//     gl: WebGLRenderingContext,
-//     program: WebGLProgram
-// ): UniformMapSetters {
-//     function createUniformSetter(info: WebGLActiveInfo): UniformSetters {
-//         // Initialization Time
-//         const loc = gl.getUniformLocation(program, info.name);
-//         return (uniformType: UniformTypes, ...values) => {
-//             const v = values[0];
-//             if (Array.isArray(v)) {
-//                 // @ts-ignore
-//                 gl[`uniform${UniformSetterWebGLType[uniformType]}`](
-//                     loc,
-//                     false,
-//                     v
-//                 );
-//             } else {
-//                 // @ts-ignore
-//                 gl[`uniform${UniformSetterWebGLType[uniformType]}`](
-//                     loc,
-//                     ...values
-//                 );
-//             }
-//         };
-//     }
-//
-//     const uniformSetters: UniformMapSetters = {};
-//     const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-//     for (let i = 0; i < numUniforms; i++) {
-//         const info = gl.getActiveUniform(program, i);
-//         if (!info) continue;
-//         uniformSetters[info.name] = createUniformSetter(info);
-//     }
-//     return uniformSetters;
-// }
-//
-// export function setUniform(
-//     programInfo: ProgramInfo,
-//     uniformName: string,
-//     uniformType: UniformTypes,
-//     ...data: UniformDataType
-// ) {
-//     const uniforms = programInfo.uniformSetters;
-//     const shaderName = `u_${uniformName}`;
-//     if (shaderName in uniforms) {
-//         uniforms[shaderName](uniformType, ...data);
-//     }
-// }
 
 function isPowerOf2(value: number) {
     return (value & (value - 1)) == 0;
