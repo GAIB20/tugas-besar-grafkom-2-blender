@@ -239,3 +239,17 @@ export function clearPhongMaterialProp() {
         elements[i].classList.add('hidden');
     }
 }
+
+export function clearNodeProp() {
+    const elements = document.getElementsByClassName('selected-node-prop');
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].classList.add('hidden');
+    }
+}
+
+export function showNodeProp() {
+    const elements = document.getElementsByClassName('selected-node-prop');
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].classList.remove('hidden');
+    }
+}
