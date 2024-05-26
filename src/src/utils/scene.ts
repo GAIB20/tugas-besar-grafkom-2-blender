@@ -36,6 +36,8 @@ export const removeNode = (node: Node) => {
             found = true;
         }
     }
+    Node.nodes.pop()
+    Node.nodeIdx--;
 }
 
 export const setupScene = (onloadCallback: () => void, meshCallback: (node: Node) => void): Node => {

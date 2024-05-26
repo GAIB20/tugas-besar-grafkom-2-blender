@@ -13,6 +13,7 @@ export class BufferAttribute {
     private _offset = 0;
     id: number;
 
+    public _buffer: WebGLBuffer | null = null;
 
     private _isDirty = true; // kita copy atribut minimal sekali di awal terlebih dahulu
 

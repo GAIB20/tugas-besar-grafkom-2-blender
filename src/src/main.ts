@@ -33,15 +33,18 @@ import {
     removeNode,
     setupScene
 } from "./utils/scene.ts";
-import { Node } from "./classes/node.ts";
-import { AnimationController } from "./classes/animation/animation-controller.ts";
-import { createButton } from "./utils/ui.ts";
-import { hexToRgb, rgbToHex } from "./utils/color.ts";
-import { phongFrag, phongVert } from "./shaders/phong.ts";
-import { IModel, loadFromJson, saveToJson } from "./utils/save-load.ts";
-import { DirectionalLight } from "./classes/light/directional-light.ts";
-import { PointLight } from "./classes/light/point-light.ts";
-import { pickFrag, pickVert } from "./shaders/pick.ts";
+import {Node} from "./classes/node.ts";
+import {AnimationController} from "./classes/animation/animation-controller.ts";
+import {createButton} from "./utils/ui.ts";
+import {hexToRgb, rgbToHex} from "./utils/color.ts";
+import {phongFrag, phongVert} from "./shaders/phong.ts";
+import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
+import {DirectionalLight} from "./classes/light/directional-light.ts";
+import {PointLight} from "./classes/light/point-light.ts";
+import {pickFrag, pickVert} from "./shaders/pick.ts";
+import {PhongMaterial} from "./classes/phong-material.ts";
+import {OrthographicCamera} from "./classes/camera/orthographic-camera.ts";
+import {ObliqueCamera} from "./classes/camera/oblique-camera.ts";
 
 // GLOBAL VARIABLE
 let playAnimationTime: number | undefined = undefined;
@@ -565,6 +568,7 @@ function main() {
     // Save and Load
     document.getElementById("downloadButton")?.addEventListener("click", () => {
         if (!rootNode) return;
+        console.log(Node.nodes)
         saveToJson(rootNode, animator?.data);
     });
 
@@ -580,12 +584,42 @@ function main() {
                         const jsonObject: IModel = JSON.parse(event.target.result);
                         console.log(jsonObject);
                         let {
-                            rootNode: newRoot, animation
-                        } = loadFromJson(jsonObject, drawScene)
+                            rootNode: newRoot, animation, camera, light
+                        } = loadFromJson(jsonObject, drawScene, setSelectedNode)
                         rootNode = newRoot
                         selectedNode = rootNode
                         createObjectHierarcy(rootNode, selectedNode, objectList, setSelectedNode);
                         animator = new AnimationController(rootNode, animation, drawScene)
+                        if (camera) {
+                            camera.computeProjectionMatrix()
+                            originNode.remove(selectedCamera)
+                            removeNode(selectedCamera)
+                            selectedCamera = camera
+                            originNode.add(selectedCamera)
+                            if (camera instanceof OrthographicCamera) {
+                                projectionSelect.value = 'orthographic'
+                            } else if (camera instanceof ObliqueCamera) {
+                                projectionSelect.value = 'oblique'
+                            } else {
+                                projectionSelect.value = 'perspective'
+                            }
+                            setupRadiusCam()
+                        }
+                        if (selectedNode instanceof Mesh && selectedNode.material instanceof PhongMaterial) {
+                            materialSelect.value = 'phong'
+                        } else {
+                            materialSelect.value = 'basic'
+                        }
+                        setupMaterialProp()
+                        if (light) {
+                            selectedLight = light
+                            if (light instanceof DirectionalLight) {
+                                lightSelect.value = 'directional'
+                            } else {
+                                lightSelect.value = 'point'
+                            }
+                            setupLightProp()
+                        }
                         drawScene()
                     } catch (error) {
                         console.error('Error parsing JSON:', error);

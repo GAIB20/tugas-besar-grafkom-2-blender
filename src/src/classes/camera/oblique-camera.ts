@@ -66,12 +66,14 @@ export class ObliqueCamera extends Camera {
 
     toObjectCamera(): ICamera {
         return {
-            type: 'orthographic',
-            orthographic: {
+            type: 'oblique',
+            oblique: {
                 near: this.near,
                 far: this.far,
                 width: this.width,
-                height: this.height
+                height: this.height,
+                angleX: this.angleX,
+                angleY: this.angleY
             }
         }
     }
