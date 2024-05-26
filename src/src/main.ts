@@ -27,6 +27,7 @@ import {basicFrag, basicVert} from "./shaders/basic.ts";
 import {Mesh} from "./classes/mesh.ts";
 import {ProgramInfo} from "./types/web-gl.ts";
 import {
+    addDefault,
     calculateTransformation,
     cleanupObjects,
     drawMesh, handleClick,
@@ -37,13 +38,14 @@ import {AnimationController} from "./classes/animation/animation-controller.ts";
 import {createButton} from "./utils/ui.ts";
 import {hexToRgb, rgbToHex} from "./utils/color.ts";
 import {phongFrag, phongVert} from "./shaders/phong.ts";
-import {IModel, loadFromJson, saveToJson} from "./utils/save-load.ts";
+import {IModel, loadFromJson, loadSubtreeFromJson, saveSubtreeToJson, saveToJson} from "./utils/save-load.ts";
 import {DirectionalLight} from "./classes/light/directional-light.ts";
 import {PointLight} from "./classes/light/point-light.ts";
 import {pickFrag, pickVert} from "./shaders/pick.ts";
 import {OrthographicCamera} from "./classes/camera/orthographic-camera.ts";
 import {ObliqueCamera} from "./classes/camera/oblique-camera.ts";
 import {BasicMaterial} from "./classes/basic-material.ts";
+import {IMeshSubtree} from "./interfaces/subtree.ts";
 
 // GLOBAL VARIABLE
 let playAnimationTime: number | undefined = undefined;
@@ -629,6 +631,7 @@ function main() {
                             setupLightProp()
                         }
                         drawScene()
+                        input.value = ''
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                     }
@@ -674,6 +677,57 @@ function main() {
         mouseY = e.clientY - rect.top;
         handleClick(gl, mouseX, mouseY, pickerFrameBuffer, canvas)
     });
+
+    // Component Editor
+    const addDefaultBtn = document.getElementById('addDefault') as HTMLButtonElement
+    const deleteComponentBtn = document.getElementById('deleteComponent') as HTMLButtonElement
+    const exportSubtreeBtn = document.getElementById('exportSubtree') as HTMLButtonElement
+    const importSubtreeInput = document.getElementById('importSubtreeInput') as HTMLInputElement
+    const importSubtreeBtn = document.getElementById('importSubtree') as HTMLButtonElement
+
+    addDefaultBtn.addEventListener('click', () => {
+        if (!selectedNode || !rootNode) return
+        addDefault(selectedNode, drawScene, setSelectedNode)
+        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+        drawScene()
+    })
+    deleteComponentBtn.addEventListener('click', () => {
+        if (!selectedNode || !rootNode) return
+        removeNode(selectedNode)
+        objectList.innerHTML = ''
+        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+        setSelectedNode(rootNode)
+        drawScene()
+    })
+    exportSubtreeBtn.addEventListener('click', () => {
+        if (!selectedNode || !(selectedNode instanceof Mesh)) return
+        saveSubtreeToJson(selectedNode)
+    })
+    importSubtreeBtn.addEventListener('click', () => {
+        if (importSubtreeInput.files && importSubtreeInput.files[0]) {
+            cleanupObjects()
+            const file = importSubtreeInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                if (!selectedNode || !rootNode) return
+                if (event.target && typeof event.target.result === 'string') {
+                    try {
+                        const jsonObject: IMeshSubtree[] = JSON.parse(event.target.result);
+                        loadSubtreeFromJson(selectedNode, jsonObject, drawScene, setSelectedNode)
+                        importSubtreeInput.value = ''
+                        createObjectHierarcy(rootNode, objectList, setSelectedNode);
+                        drawScene()
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert('Please select a JSON file first.');
+        }
+    });
+
 
     // Draw the scene.
     function drawScene() {

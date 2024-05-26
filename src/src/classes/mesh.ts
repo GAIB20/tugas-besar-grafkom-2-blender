@@ -4,6 +4,7 @@ import {IMesh} from "../interfaces/mesh.ts";
 import {BasicMaterial} from "./basic-material.ts";
 import {ShaderMaterial} from "./shader-material.ts";
 import {PhongMaterial} from "./phong-material.ts";
+import {IMeshSubtree} from "../interfaces/subtree.ts";
 
 export class Mesh extends Node {
     static Meshes: Mesh[] = [];
@@ -35,6 +36,24 @@ export class Mesh extends Node {
             basicMaterial: parseInt(this.basicMaterial.id.slice(1)),
             phongMaterial: parseInt(this.phongMaterial.id.slice(1))
         }
+    }
+
+    toObjectSubtree(): IMeshSubtree {
+        let result: IMeshSubtree = {
+            name: this.name,
+            translation: this.translation.toArray(),
+            rotation: this.rotation.toArray(),
+            scale: this.scale.toArray(),
+            attributes: this.geometry.toObjectSubtree(),
+            material: this.material instanceof BasicMaterial ? 'basic' : 'phong',
+            basicMaterial: this.basicMaterial.toObject(),
+            phongMaterial: this.phongMaterial.toObjectSubtree()
+        }
+        if (this.children.length > 0) {
+            // @ts-ignore
+            result['children'] = this.children.map((child) => child.idNode)
+        }
+        return result
     }
 
     click() {

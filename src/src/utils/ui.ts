@@ -85,7 +85,6 @@ export function createSlider(parent: { innerHTML: string; querySelector: (arg0: 
 }
 
 export function setupColorPicker(selector: string, options: { name: any; value: string, picker?: any }) {
-    console.log("tes")
     let parent = document.querySelector(selector);
     if (!parent) {
         // like jquery don't fail on a bad selector
@@ -161,6 +160,8 @@ export function createObjectHierarcy(node: Node, parent: HTMLElement, setSelecte
     const styleIl: string = 'inline-block w-full pl-4 py-1 bg-purple-900 rounded';
     const styleButton: string = 'inline-block px-2 py-1 text-white bg-transparent hover:bg-white hover:text-purple-900 rounded border border-white';
     // const styleUl : string = 'fill-current';
+
+    if(node.idNode === -1) return
 
     if (node.children.length === 0) {
         const il = document.createElement('il');
@@ -258,7 +259,6 @@ export function showNodeProp() {
 }
 
 export function setActiveNode(newNode: Node, lastNode: Node | null) {
-    console.log()
     if (lastNode) {
         const lastNodeId = `node-${lastNode.idNode}`;
         const element = document.getElementById(lastNodeId);

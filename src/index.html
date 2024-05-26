@@ -128,8 +128,15 @@
 <div>
     <canvas id="webgl-canvas" class="w-full h-full cursor-grab"></canvas>
 </div>
-<div id=rightContainer class="flex flex-col h-full bg-purple-950 w-[18vw] p-4 gap-4 text-white overflow-y-scroll">
+<div id=rightContainer class="flex flex-col h-full bg-purple-950 w-[20vw] p-4 gap-4 text-white overflow-y-scroll">
     <ul id="objectList" class="overflow-y-auto max-h-[60vh]"></ul>
+    <div class="selected-node-prop grid-cols-2">
+        <button id="addDefault" class="bg-white text-purple-900 rounded font-bold py-2">Add Default</button>
+        <button id="deleteComponent" class="bg-white text-purple-900 rounded font-bold py-2">Delete</button>
+        <input type="file" id="subtreeInput" accept=".json" class="col-span-2">
+        <button id="exportSubtree" class="bg-white text-purple-900 rounded font-bold py-2 col-span-1">Export Subtree</button>
+        <button id="importSubtree" class="bg-white text-purple-900 rounded font-bold py-2 col-span-1">Import Subtree</button>
+    </div>
     <div class="selected-node-prop">
         <h2 class="text-lg font-bold text-white">Animation</h2>
         <div id="animation" class="flex flex-col justify-center items-center w-full"></div>
