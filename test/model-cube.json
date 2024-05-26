@@ -1129,5 +1129,144 @@
       "src": "http://localhost:5173/metal/normal.jpg"
     }
   ],
-  "animation": []
+  "animation": [
+    {
+      "frames": [
+          {   
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1,
+                          "y": 1,
+                          "z": 1
+                      }
+                  }
+              ]
+              
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.1,
+                          "y": 1.1,
+                          "z": 1.1
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.2,
+                          "y": 1.2,
+                          "z": 1.2
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.3,
+                          "y": 1.3,
+                          "z": 1.3
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.4,
+                          "y": 1.4,
+                          "z": 1.4
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.5,
+                          "y": 1.5,
+                          "z": 1.5
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.6,
+                          "y": 1.6,
+                          "z": 1.6
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.7,
+                          "y": 1.7,
+                          "z": 1.7
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.8,
+                          "y": 1.8,
+                          "z": 1.8
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 1.9,
+                          "y": 1.9,
+                          "z": 1.9
+                      }
+                  }
+              ]
+          },
+          {
+              "keyframes":[
+                  {
+                      "nodeId": 0,
+                      "scale": {
+                          "x": 2,
+                          "y": 2,
+                          "z": 2
+                      }
+                  }
+              ]
+          }
+          
+      ]
+  }
+  ]
 }
