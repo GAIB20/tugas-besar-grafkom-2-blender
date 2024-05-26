@@ -31,7 +31,7 @@ import {
     calculateTransformation,
     cleanupObjects,
     drawMesh, handleClick,
-    removeNode,
+    removeNode
 } from "./utils/scene.ts";
 import {Node} from "./classes/node.ts";
 import {AnimationController} from "./classes/animation/animation-controller.ts";
@@ -682,7 +682,6 @@ function main() {
     const addDefaultBtn = document.getElementById('addDefault') as HTMLButtonElement
     const deleteComponentBtn = document.getElementById('deleteComponent') as HTMLButtonElement
     const exportSubtreeBtn = document.getElementById('exportSubtree') as HTMLButtonElement
-    const importSubtreeInput = document.getElementById('importSubtreeInput') as HTMLInputElement
     const importSubtreeBtn = document.getElementById('importSubtree') as HTMLButtonElement
 
     addDefaultBtn.addEventListener('click', () => {
@@ -704,6 +703,7 @@ function main() {
         saveSubtreeToJson(selectedNode)
     })
     importSubtreeBtn.addEventListener('click', () => {
+        const importSubtreeInput = document.getElementById('subtreeInput') as HTMLInputElement
         if (importSubtreeInput.files && importSubtreeInput.files[0]) {
             cleanupObjects()
             const file = importSubtreeInput.files[0];
@@ -713,6 +713,7 @@ function main() {
                 if (event.target && typeof event.target.result === 'string') {
                     try {
                         const jsonObject: IMeshSubtree[] = JSON.parse(event.target.result);
+                        console.log(jsonObject)
                         loadSubtreeFromJson(selectedNode, jsonObject, drawScene, setSelectedNode)
                         importSubtreeInput.value = ''
                         createObjectHierarcy(rootNode, objectList, setSelectedNode);
