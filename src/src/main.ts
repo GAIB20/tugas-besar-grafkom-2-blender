@@ -89,6 +89,7 @@ function main() {
             }
             if (animator.isPlaying()) {
                 animator.stop();
+                playAnimationTime = undefined;
                 // if (animButton) animButton.textContent = "Play";
             } else {
                 animator.play();
@@ -254,18 +255,20 @@ function main() {
 
     const playAnimation = (time: number) => {
         if (!animator) return
+        if(!animator.isPlaying()) return
         if (playAnimationTime === undefined) {
+            console.log('reset')
             playAnimationTime = time;
         }
-        const deltaSecond = (time - playAnimationTime) / 1000;
+        let deltaSecond = (time - playAnimationTime) / 1000;
+        console.log(animator.currentFrame());
         animator.update(deltaSecond);
         // animator.update(time);
         drawScene();
 
         playAnimationTime = time;
-        if (animator.isPlaying()) {
-            requestAnimationFrame(playAnimation);
-        }
+        requestAnimationFrame(playAnimation);
+        
     }
 
     function setSelectedNode(node: Node) {

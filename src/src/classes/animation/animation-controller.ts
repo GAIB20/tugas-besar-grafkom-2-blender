@@ -63,10 +63,19 @@ export class AnimationController {
         this._playing = false;
     }
 
+    currentFrame() {
+        return this._currentFrame;
+    }
+
+    setDeltaFrame(delta: number) {
+        this._deltaFrame = delta;
+    }
+
     update(secElapsed: number) {
         if (this._playing) {
             this._deltaFrame += (secElapsed * this.fps * this.speed);
             if(this._deltaFrame >= 1 && this._tweening == "None"){
+                console.log("frame before:" + this._currentFrame);
                 if (this._reverse) {
                     this._currentFrame = (this._currentFrame - Math.floor(this._deltaFrame)) % this._frames.length;
                     if (this._currentFrame < 0) {
