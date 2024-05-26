@@ -74,7 +74,7 @@ export class AnimationController {
     update(secElapsed: number) {
         if (this._playing) {
             this._deltaFrame += (secElapsed * this.fps * this.speed);
-            if(this._deltaFrame >= 1 && this._tweening == "None"){
+            if(this._deltaFrame >= 1){
                 console.log("frame before:" + this._currentFrame);
                 if (this._reverse) {
                     this._currentFrame = (this._currentFrame - Math.floor(this._deltaFrame)) % this._frames.length;
